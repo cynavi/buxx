@@ -1,3 +1,3 @@
-Hybrid app to manage finances built using Angular, Ionic, and NX.
+Hybrid app to manage finances built using Angular, Ionic, Supabase, and NX.
 
 Working on it..
