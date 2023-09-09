@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Sign In</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="center-xy">
+    <div [formGroup]="signInForm">
+
+      <ion-item>
+        <ion-input
+          errorText="Invalid Email"
+          formControlName="email"
+          label="Email"
+          type="text"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <app-show-hide-password>
+          <ion-input
+            formControlName="password"
+            label="Password"
+            type="password"
+          ></ion-input>
+        </app-show-hide-password>
+      </ion-item>
+
+      <div style="display: flex; flex-direction: column">
+        <ion-label color="danger">{{signInStore.error()}}</ion-label>
+
+        <div class="flex-row-center mt-5">
+          <ion-button (click)="signInWithPassword()"
+                      [disabled]="!signInForm.valid || !signInStore.loaded()"
+                      color="light"
+                      fill="outline">
+            {{signInStore.loaded() ? 'Sign In' : 'Signing In..'}}
+          </ion-button>
+          <ion-button (click)="signInWithProvider('google')" *ngIf="!isPlatformCapacitor" color="light" fill="outline">
+            Continue with
+            <ion-icon class="ml-4" name="logo-google"></ion-icon>
+          </ion-button>
+        </div>
+        <div class="flex-row-center mt-16">
+          <ion-label style="align-self: center">Not a user yet?</ion-label>
+          <ion-button (click)="signUp()"
+                      class="ml-4"
+                      color="light"
+                      fill="outline">
+            Sign Up
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

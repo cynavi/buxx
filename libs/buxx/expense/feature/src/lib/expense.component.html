@@ -1,0 +1,41 @@
+<ng-container *ngIf="expenseStore.loaded(); else loading">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="secondary">
+        <app-create-new-transaction [confirmCallback]="emitSaveTransactionEvent.bind(this)"></app-create-new-transaction>
+        <ion-button (click)="openSearchModal()" shape="round">
+          <ion-icon name="search" slot="start"></ion-icon>
+          Search..
+        </ion-button>
+      </ion-buttons>
+      <ion-title>Expense</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <ion-refresher (ionRefresh)="fetchExpense($event)" slot="fixed">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <ion-header collapse="condense">
+      <ion-toolbar>
+        <ion-title size="large">Expense</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-accordion-group [animateInAnimation]="fadeAnimationUtil.fadeUp()" animateIn>
+      <ng-container *ngFor="let expense of expenseStore.expenses()">
+        <app-transaction [entry]="expense" [isExpense]="true"></app-transaction>
+      </ng-container>
+    </ion-accordion-group>
+    <ion-infinite-scroll (ionInfinite)="onInfiniteScroll($event)">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ion-content>
+</ng-container>
+
+<ng-template #loading>
+  <div class="min-h-full">
+    <app-loading-toolbar toolbarTitle="Expense"></app-loading-toolbar>
+  </div>
+</ng-template>

@@ -1,0 +1,13 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="secondary">
+      <app-create-new-transaction [confirmCallback]="emitSaveTransactionEvent.bind(this)"></app-create-new-transaction>
+      <app-search></app-search>
+    </ion-buttons>
+    <ion-title>Dashboard</ion-title>
+    <ion-progress-bar type="indeterminate"></ion-progress-bar>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <app-dog-running></app-dog-running>
+</ion-content>

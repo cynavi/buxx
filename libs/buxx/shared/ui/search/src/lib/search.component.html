@@ -1,0 +1,104 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()" color="medium">Cancel</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="confirm()" [disabled]="!searchForm.valid" [strong]="true">Confirm</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div [formGroup]="searchForm">
+    <ion-item>
+      <ion-select formControlName="baseOp" label="Search Matches" value="or">
+        <ion-select-option value="or">Any Criteria</ion-select-option>
+        <ion-select-option value="and">All Criteria</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        errorText="Invalid Name"
+        formControlName="name"
+        label="Name"
+        type="text"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-select formControlName="amountOp" label="Amount" value=">">
+        <ion-select-option value="<">less than</ion-select-option>
+        <ion-select-option value="<=">less than or equals</ion-select-option>
+        <ion-select-option value="==">equals</ion-select-option>
+        <ion-select-option value="!=">not equals</ion-select-option>
+        <ion-select-option value=">">greater than</ion-select-option>
+        <ion-select-option value=">=">greater than or equals</ion-select-option>
+      </ion-select>
+      <ion-input
+        aria-label="Amount"
+        errorText="Invalid Amount"
+        formControlName="amountValue"
+        positiveNumberOnly
+        type="text"
+      ></ion-input>
+
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        [value]="searchForm.get('fromDate')?.value | date : 'dd-MM-yyyy'"
+        errorText="Invalid Date"
+        id="fromDate"
+        label="From Date"
+      ></ion-input>
+      <ion-popover size="cover" trigger="fromDate">
+        <ng-template>
+          <ion-datetime
+            [max]="todayDate"
+            [preferWheel]="true"
+            formControlName="fromDate"
+            presentation="date"
+          ></ion-datetime>
+        </ng-template>
+      </ion-popover>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        [value]="searchForm.get('toDate')?.value | date : 'dd-MM-yyyy'"
+        errorText="Invalid Date"
+        id="toDate"
+        label="To Date"
+      ></ion-input>
+      <ion-popover size="cover" trigger="toDate">
+        <ng-template>
+          <ion-datetime
+            [max]="todayDate"
+            [preferWheel]="true"
+            formControlName="toDate"
+            presentation="date"
+          ></ion-datetime>
+        </ng-template>
+      </ion-popover>
+    </ion-item>
+
+    <ion-item>
+      <ion-input #tagInput label="Tags" type="text"></ion-input>
+      <ion-fab-button (click)="addTag()" color="dark" size="small">
+        <ion-icon name="add-circle"></ion-icon>
+      </ion-fab-button>
+    </ion-item>
+
+    <ion-item *ngIf="tags.length">
+      <ion-label class="ion-text-wrap">
+        <ng-container *ngFor="let tag of tags; let i = index">
+          <ion-chip>
+            <ion-label>{{ tag }}</ion-label>
+            <ion-icon (click)="removeTag(i)" name="close-circle"></ion-icon>
+          </ion-chip>
+        </ng-container>
+      </ion-label>
+    </ion-item>
+  </div>
+</ion-content>

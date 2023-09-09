@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Sign Up</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="center-xy">
+    <div [formGroup]="signUpForm">
+
+      <ion-item>
+        <ion-input
+          errorText="Invalid Email"
+          formControlName="email"
+          label="Email"
+          type="text"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <app-show-hide-password>
+          <ion-input
+            [errorText]="INVALID_PASSWORD_MESSAGE"
+            formControlName="password"
+            label="Password"
+            type="password"
+          ></ion-input>
+        </app-show-hide-password>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          errorText="Invalid Name"
+          formControlName="name"
+          label="Name"
+          type="text"
+        ></ion-input>
+      </ion-item>
+
+      <div style="display: flex; flex-direction: column">
+        <ion-label color="danger">{{errMessage}}</ion-label>
+        <ion-button (click)="signUp()" [disabled]="!signUpForm.valid" class="mt-5"
+                    color="light"
+                    fill="outline"
+                    style="align-self: center">
+          Sign Up
+        </ion-button>
+
+        <div class="flex-row-center mt-16">
+          <ion-label style="align-self: center">Already a user?</ion-label>
+          <ion-button (click)="signIn()"
+                      class="ml-4"
+                      color="light"
+                      fill="outline">
+            Sign In
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

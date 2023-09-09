@@ -1,0 +1,74 @@
+import { Component, inject, OnInit } from '@angular/core';
+import { InfiniteScrollCustomEvent, IonicModule, ModalController } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
+import { sub } from 'date-fns';
+import { AnimateInModule, FadeAnimationUtil } from '@buxx/shared/animate-in';
+import { IncomeStore } from '@buxx/income/data-access';
+import { SearchComponent } from '@buxx/shared/ui/search';
+import { CreateNewTransactionComponent } from '@buxx/shared/ui/create-new-transaction';
+import { TransactionComponent } from '@buxx/shared/ui/transaction';
+import { LoadingToolbarComponent } from '@buxx/shared/ui/loading-toolbar';
+import { QueryCriteria, TransactionDB } from '@buxx/shared/model';
+import { ExpenseStore } from '@buxx/expense/data-access';
+
+@Component({
+  selector: 'app-income',
+  templateUrl: './income.component.html',
+  standalone: true,
+  imports: [
+    IonicModule,
+    CommonModule,
+    CreateNewTransactionComponent,
+    AnimateInModule,
+    TransactionComponent,
+    LoadingToolbarComponent
+  ],
+  providers: [IncomeStore]
+})
+export class IncomeComponent implements OnInit {
+
+  readonly fadeAnimationUtil = FadeAnimationUtil;
+  readonly incomeStore: IncomeStore = inject(IncomeStore);
+  private readonly expenseStore: ExpenseStore = inject(ExpenseStore);
+  private readonly modalController: ModalController = inject(ModalController);
+
+  ngOnInit(): void {
+    this.fetchIncome();
+  }
+
+  fetchIncome(event?: unknown): void {
+    this.incomeStore.fetch$.next({
+      fromDate: sub(new Date(), {days: 30}),
+      toDate: new Date()
+    });
+  }
+
+  onInfiniteScroll(event: Event): void {
+    this.incomeStore.infiniteScroll$.next(event as InfiniteScrollCustomEvent);
+  }
+
+  emitSaveTransactionEvent(transaction: TransactionDB.Save): void {
+    if (transaction.is_expense) {
+      this.expenseStore.save$.next(transaction);
+    } else {
+      this.incomeStore.save$.next(transaction);
+    }
+  }
+
+  async openSearchModal(): Promise<void> {
+    const modal: HTMLIonModalElement = await this.modalController.create({
+      component: SearchComponent,
+      componentProps: {
+        searchCriteria: this.incomeStore.searchCriteria()
+      },
+      backdropDismiss: false,
+      animated: true
+    });
+    modal.present().then();
+    await modal.onWillDismiss().then(overlayEventDetail => {
+      if (overlayEventDetail.role === 'confirm' && overlayEventDetail.data?.searchCriteria satisfies QueryCriteria) {
+        this.incomeStore.fetch$.next(overlayEventDetail.data.searchCriteria);
+      }
+    });
+  }
+}

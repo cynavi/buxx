@@ -1,0 +1,39 @@
+@mixin animation($anim) {
+  -o-animation: $anim;
+  -ms-animation: $anim;
+  -moz-animation: $anim;
+  -webkit-animation: $anim;
+  animation: $anim;
+}
+
+@mixin keyframes($animationName) {
+  @-webkit-keyframes #{$animationName} {
+    @content;
+  }
+  @-moz-keyframes #{$animationName}  {
+    @content;
+  }
+  @-o-keyframes #{$animationName} {
+    @content;
+  }
+  @keyframes #{$animationName} {
+    @content;
+  }
+}
+
+.dog {
+  width: 373px;
+  height: 177px;
+  background-size: 2238px 177px;
+  background-repeat: no-repeat;
+  @include animation(run 1s steps(6) infinite);
+}
+
+@include keyframes(run) {
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: -2238px 0px;
+  }
+}

@@ -1,0 +1,86 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()" color="medium">Cancel</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="confirm()" [disabled]="!entryForm.valid" [strong]="true">Confirm</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div [formGroup]="entryForm">
+
+    <ion-item *ngIf="!entry">
+      <ion-select formControlName="saveType" label="Type">
+        <ion-select-option value="expense">Expense</ion-select-option>
+        <ion-select-option value="income">Income</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-input errorText="Invalid Name" formControlName="name" label="Name" type="text"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        errorText="Invalid Amount"
+        formControlName="amount"
+        label="Amount"
+        positiveNumberOnly
+        type="text"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        [value]="entryForm.get('date')?.value | toDate : 'dd-MM-yyyy'"
+        errorText="Invalid Date"
+        id="date"
+        label="Date"
+      ></ion-input>
+      <ion-popover size="cover" trigger="date">
+        <ng-template>
+          <ion-datetime
+            [max]="todayDate"
+            [preferWheel]="true"
+            formControlName="date"
+            presentation="date"
+          ></ion-datetime>
+        </ng-template>
+      </ion-popover>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        #tagInput
+        label="Tags"
+        type="text"
+      ></ion-input>
+      <ion-fab-button (click)="addTag()" color="dark" size="small">
+        <ion-icon name="add-circle"></ion-icon>
+      </ion-fab-button>
+    </ion-item>
+
+    <ion-item *ngIf="tags.length">
+      <ion-label class="ion-text-wrap">
+        <ng-container *ngFor="let tag of tags; let i = index">
+          <ion-chip>
+            <ion-label>{{ tag }}</ion-label>
+            <ion-icon (click)="removeTag(i)" name="close-circle"></ion-icon>
+          </ion-chip>
+        </ng-container>
+      </ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        errorText="Invalid Detail"
+        formControlName="detail"
+        label="Detail"
+        type="textarea"
+      ></ion-input>
+    </ion-item>
+  </div>
+</ion-content>

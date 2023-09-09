@@ -1,0 +1,82 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@buxx/auth/data-access": ["libs/buxx/auth/data-access/src/index.ts"],
+      "@buxx/dashboard/data-access": [
+        "libs/buxx/dashboard/data-access/src/index.ts"
+      ],
+      "@buxx/dashboard/feature": [
+        "libs/buxx/dashboard/feature/src/index.ts"
+      ],
+      "@buxx/expense": ["libs/buxx/expense/src/index.ts"],
+      "@buxx/expense/data-access": [
+        "libs/buxx/expense/data-access/src/index.ts"
+      ],
+      "@buxx/expense/feature": ["libs/buxx/expense/feature/src/index.ts"],
+      "@buxx/income/data-access": [
+        "libs/buxx/income/data-access/src/index.ts"
+      ],
+      "@buxx/income/feature": ["libs/buxx/income/feature/src/index.ts"],
+      "@buxx/shared/animate-in": [
+        "libs/buxx/shared/animate-in/src/index.ts"
+      ],
+      "@buxx/shared/app-config": [
+        "libs/buxx/shared/app-config/src/index.ts"
+      ],
+      "@buxx/shared/data-access/models": [
+        "libs/buxx/shared/data-access/models/src/index.ts"
+      ],
+      "@buxx/shared/data-access/store": [
+        "libs/buxx/shared/data-access/store/src/index.ts"
+      ],
+      "@buxx/shared/directive": ["libs/buxx/shared/directive/src/index.ts"],
+      "@buxx/shared/model": ["libs/buxx/shared/model/src/index.ts"],
+      "@buxx/shared/pipe": ["libs/buxx/shared/pipe/src/index.ts"],
+      "@buxx/shared/ui/create-new-transaction": [
+        "libs/buxx/shared/ui/create-new-transaction/src/index.ts"
+      ],
+      "@buxx/shared/ui/dog-running": [
+        "libs/buxx/shared/ui/dog-running/src/index.ts"
+      ],
+      "@buxx/shared/ui/header": ["libs/buxx/shared/ui/header/src/index.ts"],
+      "@buxx/shared/ui/loading-toolbar": [
+        "libs/buxx/shared/ui/loading-toolbar/src/index.ts"
+      ],
+      "@buxx/shared/ui/search": ["libs/buxx/shared/ui/search/src/index.ts"],
+      "@buxx/shared/ui/show-hide-password": [
+        "libs/buxx/shared/ui/show-hide-password/src/index.ts"
+      ],
+      "@buxx/shared/ui/tab": ["libs/buxx/shared/ui/tab/src/index.ts"],
+      "@buxx/shared/ui/transaction": [
+        "libs/buxx/shared/ui/transaction/src/index.ts"
+      ],
+      "@buxx/shared/ui/transaction-save-update": [
+        "libs/buxx/shared/ui/transaction-save-update/src/index.ts"
+      ],
+      "@buxx/shared/util": ["libs/buxx/shared/util/src/index.ts"],
+      "@buxx/sign-in/data-access": [
+        "libs/buxx/sign-in/data-access/src/index.ts"
+      ],
+      "@buxx/sign-in/feature": ["libs/buxx/sign-in/feature/src/index.ts"],
+      "@buxx/sign-up/data-access": [
+        "libs/buxx/sign-up/data-access/src/index.ts"
+      ],
+      "@buxx/sign-up/feature": ["libs/buxx/sign-up/feature/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

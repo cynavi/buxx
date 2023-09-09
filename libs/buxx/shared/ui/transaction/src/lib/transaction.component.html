@@ -1,0 +1,46 @@
+<ion-accordion>
+    <ion-item slot="header">
+        <ion-icon class="mr-4" color="white" name="wallet-outline"></ion-icon>
+        <ion-label>
+            {{ entry.name}}
+            <span style="color: rgba(255, 255, 255, 0.7)">{{ entry.date | toDate }}</span>
+        </ion-label>
+
+        <ion-label [color]="isExpense ? 'danger' : 'success'">
+            <strong>Rs. {{ entry.amount }}</strong>
+        </ion-label>
+
+        <ion-fab-button
+                (click)="openModal(); $event.stopPropagation()"
+                color="dark"
+                size="small"
+        >
+            <ion-icon color="warning" name="create-outline"></ion-icon>
+        </ion-fab-button>
+
+        <ion-fab-button
+                (click)="deleteEntry(); $event.stopPropagation()"
+                color="dark"
+                size="small"
+        >
+            <ion-icon color="danger" name="trash-outline"></ion-icon>
+        </ion-fab-button>
+    </ion-item>
+    <div class="ion-padding" slot="content">
+        <ion-card>
+            <ion-card-header>
+                <ion-card-title>{{entry.name}}, Rs {{entry.amount}}</ion-card-title>
+                <ion-card-subtitle>{{entry.date | date}}</ion-card-subtitle>
+            </ion-card-header>
+
+            <ion-card-content>
+                {{entry.details}}
+            </ion-card-content>
+            <ng-container *ngFor="let tag of entry.tags; let i = index">
+                <ion-chip>
+                    <ion-label>{{ tag }}</ion-label>
+                </ion-chip>
+            </ng-container>
+        </ion-card>
+    </div>
+</ion-accordion>

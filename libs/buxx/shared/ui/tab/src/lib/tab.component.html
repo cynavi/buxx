@@ -1,0 +1,38 @@
+<ion-router-outlet id="menuContent"></ion-router-outlet>
+<ion-tabs *ngIf="authStore.session()">
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="dashboard">
+      <ion-icon name="bar-chart-outline"></ion-icon>
+      <ion-label>Dashboard</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="expense">
+      <ion-icon name="trending-down-outline"></ion-icon>
+      <ion-label>Expense</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="income">
+      <ion-icon name="trending-up-outline"></ion-icon>
+      <ion-label>Income</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button (click)="openMenu()">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>Profile</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
+
+<ion-menu contentId="menuContent" menuId="menu" side="end">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Profile</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="ion-padding">
+    <ion-button (click)="signOut()" color="tertiary">
+      <ion-icon name="log-out-outline"></ion-icon>
+      Sign Out
+    </ion-button>
+  </ion-content>
+</ion-menu>
