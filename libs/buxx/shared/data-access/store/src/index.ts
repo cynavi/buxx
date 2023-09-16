@@ -1,1 +1,1 @@
-export * from './lib/buxx-shared-data-access-store.module';
+export * from './lib/transaction.service';

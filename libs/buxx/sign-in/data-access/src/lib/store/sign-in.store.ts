@@ -25,7 +25,7 @@ export class SignInStore {
     error: null
   });
   loaded: Signal<boolean> = computed(() => this.state().loaded);
-  error: Signal<String | null> = computed(() => this.state().error);
+  error: Signal<string | null> = computed(() => this.state().error);
 
   constructor() {
     this.signIn$.pipe(

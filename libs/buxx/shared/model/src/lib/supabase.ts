@@ -6,6 +6,10 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
+export type BuxxSchema = Database['public'];
+export type BuxxRow = Database['public']['Tables']['transactions']['Row'];
+export const BUXX_TABLE = 'transactions';
+
 export interface Database {
   graphql_public: {
     Tables: {
@@ -31,7 +35,7 @@ export interface Database {
     CompositeTypes: {
       [_ in never]: never
     }
-  }
+  };
   public: {
     Tables: {
       transactions: {
@@ -75,7 +79,7 @@ export interface Database {
     CompositeTypes: {
       [_ in never]: never
     }
-  }
+  };
   storage: {
     Tables: {
       buckets: {
@@ -254,5 +258,5 @@ export interface Database {
     CompositeTypes: {
       [_ in never]: never
     }
-  }
+  };
 }

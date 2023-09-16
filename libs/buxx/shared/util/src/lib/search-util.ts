@@ -1,4 +1,4 @@
-import { Database, QueryCriteria, TransactionDB } from '@buxx/shared/model';
+import { BUXX_TABLE, BuxxRow, BuxxSchema, Database, QueryCriteria, TransactionDB } from '@buxx/shared/model';
 import PostgrestFilterBuilder from '@supabase/postgrest-js/dist/module/PostgrestFilterBuilder';
 import { supabase } from '@buxx/shared/app-config';
 import { format } from 'date-fns';
@@ -25,9 +25,10 @@ export class SearchUtil {
   }
 
   static buildQuery(criteria: QueryCriteria, range: { to: number, from: number }):
-    PostgrestFilterBuilder<Database['public'], Database['public']['Tables']['transactions']['Row'], TransactionDB.ResultSet[], unknown> {
-    let query = supabase.from('transactions').select('id, name, completed_date, amount, tags, details') satisfies
-      PostgrestFilterBuilder<Database['public'], Database['public']['Tables']['transactions']['Row'], TransactionDB.ResultSet[], unknown>;
+    PostgrestFilterBuilder<BuxxSchema, BuxxRow, TransactionDB.ResultSet[], unknown> {
+    let query: PostgrestFilterBuilder<BuxxSchema, BuxxRow, TransactionDB.ResultSet[], unknown> = supabase
+      .from(BUXX_TABLE)
+      .select('id, name, completed_date, amount, tags, details');
     if (criteria.name) {
       query = query.ilike('name', `%${criteria.name}%`);
     }

@@ -11,7 +11,7 @@ import { SignInStore } from '@buxx/sign-in/data-access';
 import { Provider } from '@supabase/supabase-js';
 
 @Component({
-  selector: 'app-home',
+  selector: 'buxx-home',
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.scss'],
   standalone: true,

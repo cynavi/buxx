@@ -1,12 +1,13 @@
-import { Database, QueryCriteria, Transaction, TransactionDB } from '@buxx/shared/model';
+import { BuxxRow, BuxxSchema, QueryCriteria, Transaction, TransactionDB } from '@buxx/shared/model';
 import { computed, inject, Injectable, signal, Signal, WritableSignal } from '@angular/core';
-import { environment, supabase } from '@buxx/shared/app-config';
-import { from, map, Observable, Subject, switchMap } from 'rxjs';
+import { environment } from '@buxx/shared/app-config';
+import { from, map, Subject, switchMap } from 'rxjs';
 import { InfiniteScrollCustomEvent, ToastController } from '@ionic/angular';
 import PostgrestFilterBuilder from '@supabase/postgrest-js/dist/module/PostgrestFilterBuilder';
 import { SearchUtil, ToastUtil } from '@buxx/shared/util';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PostgrestSingleResponse } from '@supabase/supabase-js';
+import { TransactionService } from '@buxx/shared/data-access/store';
 
 interface IncomeState {
   incomes: Transaction[];
@@ -19,6 +20,7 @@ interface IncomeState {
 export class IncomeStore {
 
   private readonly toastController = inject(ToastController);
+  private readonly transactionService = inject(TransactionService);
 
   range: { from: number, to: number } = { from: 0, to: environment.pageSize };
   infiniteScroll$: Subject<InfiniteScrollCustomEvent> = new Subject<InfiniteScrollCustomEvent>();
@@ -26,11 +28,7 @@ export class IncomeStore {
   update$: Subject<TransactionDB.Update> = new Subject<TransactionDB.Update>();
   delete$: Subject<TransactionDB.Delete> = new Subject<TransactionDB.Delete>();
   fetch$: Subject<QueryCriteria> = new Subject<QueryCriteria>();
-  queryProp: Signal<PostgrestFilterBuilder<
-    Database['public'],
-    Database['public']['Tables']['transactions']['Row'],
-    TransactionDB.ResultSet[], unknown
-  > | null> = computed(() => {
+  queryProp: Signal<PostgrestFilterBuilder<BuxxSchema, BuxxRow, TransactionDB.ResultSet[], unknown> | null> = computed(() => {
     // TODO: Get range from signal??
     this.range = { from: 0, to: environment.pageSize };
     return this.searchCriteria()
@@ -61,7 +59,7 @@ export class IncomeStore {
       takeUntilDestroyed(),
       switchMap((event: InfiniteScrollCustomEvent) => {
         this.range = { from: this.range.to++, to: this.range.to++ + environment.pageSize };
-        return this.getIncomes().pipe(
+        return this.transactionService.getTransactions(this.queryProp()!, false).pipe(
           map((incomes: Transaction[]) => ({ incomes, event }))
         );
       })
@@ -83,7 +81,7 @@ export class IncomeStore {
   private handleSaveEvent(): void {
     this.save$.pipe(
       takeUntilDestroyed(),
-      switchMap((expense: TransactionDB.Save) => from(this.saveIncome(expense)))
+      switchMap((income: TransactionDB.Save) => from(this.transactionService.saveTransaction(income)))
     ).subscribe({
       next: () => ToastUtil.open(`Income has been saved.`, this.toastController),
       error: err => {
@@ -98,7 +96,7 @@ export class IncomeStore {
       takeUntilDestroyed(),
       switchMap((criteria: QueryCriteria) => {
           this.state.update(state => ({ ...state, searchCriteria: criteria, loaded: false }));
-          return this.getIncomes();
+          return this.transactionService.getTransactions(this.queryProp()!, false);
         }
       )
     ).subscribe({
@@ -119,11 +117,11 @@ export class IncomeStore {
   private handleUpdateEvent(): void {
     this.update$.pipe(
       takeUntilDestroyed(),
-      switchMap((expense: TransactionDB.Update) => from(this.updateIncome(expense)).pipe(
-        map((response: PostgrestSingleResponse<unknown>) => ({ response, expense }))
+      switchMap((income: TransactionDB.Update) => from(this.transactionService.updateTransaction(income)).pipe(
+        map((response: PostgrestSingleResponse<unknown>) => ({ response, income }))
       ))
     ).subscribe(data => {
-      const { response, expense } = data;
+      const { response, income } = data;
       if (response.status === 204) {
         ToastUtil.open(`Income has been updated.`, this.toastController).then();
       } else if (response.error) {
@@ -135,7 +133,7 @@ export class IncomeStore {
   private handleDeleteEvent(): void {
     this.delete$.pipe(
       takeUntilDestroyed(),
-      switchMap(id => from(this.deleteIncome(id)).pipe(
+      switchMap(id => from(this.transactionService.deleteTransaction(id)).pipe(
         map((response: PostgrestSingleResponse<unknown>) => ({ response, id }))
       ))
     ).subscribe(data => {
@@ -146,37 +144,5 @@ export class IncomeStore {
         this.state.update(state => ({ ...state, error: response.error.message }));
       }
     });
-  }
-
-  private getIncomes(): Observable<Transaction[]> {
-    return from(this.queryProp()!.eq('is_expense', false))
-      .pipe(map(response => {
-        const incomes: Transaction[] = [];
-        response?.data?.forEach((entry: TransactionDB.ResultSet) => incomes.push({
-            id: entry.id,
-            name: entry.name,
-            amount: entry.amount,
-            date: entry.completed_date,
-            details: entry.details,
-            tags: entry.tags
-          })
-        );
-        return incomes;
-      }));
-  }
-
-  private saveIncome(income: TransactionDB.Save):
-    PostgrestFilterBuilder<Database['public'], Database['public']['Tables']['transactions']['Row'], null, unknown> {
-    return supabase.from('transactions').insert(income);
-  }
-
-  private updateIncome(income: TransactionDB.Update):
-    PostgrestFilterBuilder<Database['public'], Database['public']['Tables']['transactions']['Row'], null, unknown> {
-    return supabase.from('transactions').update(income).eq('id', income.id);
-  }
-
-  private deleteIncome(id: TransactionDB.Delete):
-    PostgrestFilterBuilder<Database['public'], Database['public']['Tables']['transactions']['Row'], null, unknown> {
-    return supabase.from('transactions').delete().eq('id', id);
   }
 }

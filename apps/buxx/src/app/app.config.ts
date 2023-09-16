@@ -8,6 +8,7 @@ import { BnNgIdleService } from 'bn-ng-idle';
 import { AuthStore } from '@buxx/auth/data-access';
 import { ExpenseStore } from '@buxx/expense/data-access';
 import { IncomeStore } from '@buxx/income/data-access';
+import { TransactionService } from '@buxx/shared/data-access/store';
 
 const routes: Routes = [
   {
@@ -51,6 +52,7 @@ export const appConfig: ApplicationConfig = {
       ModalController
     ),
     BnNgIdleService,
+    TransactionService,
     AuthStore,
     ExpenseStore,
     IncomeStore,

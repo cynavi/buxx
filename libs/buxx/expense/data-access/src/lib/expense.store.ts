@@ -1,12 +1,13 @@
-import { Database, QueryCriteria, Transaction, TransactionDB } from '@buxx/shared/model';
+import { BuxxRow, BuxxSchema, Database, QueryCriteria, Transaction, TransactionDB } from '@buxx/shared/model';
 import { computed, inject, Injectable, signal, Signal, WritableSignal } from '@angular/core';
-import { from, map, Observable, Subject, switchMap } from 'rxjs';
+import { from, map, Subject, switchMap } from 'rxjs';
 import { InfiniteScrollCustomEvent, ToastController } from '@ionic/angular';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PostgrestSingleResponse } from '@supabase/supabase-js';
 import PostgrestFilterBuilder from '@supabase/postgrest-js/dist/module/PostgrestFilterBuilder';
-import { environment, supabase } from '@buxx/shared/app-config';
+import { environment } from '@buxx/shared/app-config';
 import { SearchUtil, ToastUtil } from '@buxx/shared/util';
+import { TransactionService } from '@buxx/shared/data-access/store';
 
 interface ExpenseState {
   expenses: Transaction[];
@@ -19,6 +20,7 @@ interface ExpenseState {
 export class ExpenseStore {
 
   private readonly toastController = inject(ToastController);
+  private readonly transactionService = inject(TransactionService);
 
   range: { from: number, to: number } = { from: 0, to: environment.pageSize };
   infiniteScroll$: Subject<InfiniteScrollCustomEvent> = new Subject<InfiniteScrollCustomEvent>();
@@ -26,16 +28,12 @@ export class ExpenseStore {
   update$: Subject<TransactionDB.Update> = new Subject<TransactionDB.Update>();
   delete$: Subject<TransactionDB.Delete> = new Subject<TransactionDB.Delete>();
   fetch$: Subject<QueryCriteria> = new Subject<QueryCriteria>();
-  queryProp: Signal<PostgrestFilterBuilder<
-    Database['public'],
-    Database['public']['Tables']['transactions']['Row'],
-    TransactionDB.ResultSet[], unknown
-  > | null> = computed(() => {
+  queryProp: Signal<PostgrestFilterBuilder<BuxxSchema, BuxxRow, TransactionDB.ResultSet[], unknown> | null> = computed(() => {
     // TODO: Get range from signal??
     this.range = { from: 0, to: environment.pageSize };
     return this.searchCriteria()
       ? SearchUtil.buildQuery(this.searchCriteria()!, this.range)
-      : null
+      : null;
   });
   private state: WritableSignal<ExpenseState> = signal<ExpenseState>({
     expenses: [],
@@ -60,8 +58,11 @@ export class ExpenseStore {
     this.infiniteScroll$.pipe(
       takeUntilDestroyed(),
       switchMap((event: InfiniteScrollCustomEvent) => {
+        if (null == this.queryProp()) {
+          return [];
+        }
         this.range = { from: this.range.to++, to: this.range.to++ + environment.pageSize };
-        return this.getExpenses().pipe(
+        return this.transactionService.getTransactions(this.queryProp()!, true).pipe(
           map((expenses: Transaction[]) => ({ expenses, event }))
         );
       })
@@ -83,7 +84,7 @@ export class ExpenseStore {
   private handleSaveEvent(): void {
     this.save$.pipe(
       takeUntilDestroyed(),
-      switchMap((expense: TransactionDB.Save) => from(this.saveExpense(expense)))
+      switchMap((expense: TransactionDB.Save) => from(this.transactionService.saveTransaction(expense)))
     ).subscribe({
       next: () => ToastUtil.open(`Expense has been saved.`, this.toastController),
       error: err => {
@@ -98,7 +99,7 @@ export class ExpenseStore {
       takeUntilDestroyed(),
       switchMap((criteria: QueryCriteria) => {
           this.state.update(state => ({ ...state, searchCriteria: criteria, loaded: false }));
-          return this.getExpenses();
+          return this.transactionService.getTransactions(this.queryProp()!, true);
         }
       )
     ).subscribe({
@@ -119,7 +120,7 @@ export class ExpenseStore {
   private handleUpdateEvent(): void {
     this.update$.pipe(
       takeUntilDestroyed(),
-      switchMap((expense: TransactionDB.Update) => from(this.updateExpense(expense)).pipe(
+      switchMap((expense: TransactionDB.Update) => from(this.transactionService.updateTransaction(expense)).pipe(
         map((response: PostgrestSingleResponse<unknown>) => ({ response, expense }))
       ))
     ).subscribe(data => {
@@ -135,7 +136,7 @@ export class ExpenseStore {
   private handleDeleteEvent(): void {
     this.delete$.pipe(
       takeUntilDestroyed(),
-      switchMap(id => from(this.deleteExpense(id)).pipe(
+      switchMap(id => from(this.transactionService.deleteTransaction(id)).pipe(
         map((response: PostgrestSingleResponse<unknown>) => ({ response, id }))
       ))
     ).subscribe(data => {
@@ -146,37 +147,5 @@ export class ExpenseStore {
         this.state.update(state => ({ ...state, error: response.error.message }));
       }
     });
-  }
-
-  private getExpenses(): Observable<Transaction[]> {
-    return from(this.queryProp()!.eq('is_expense', true))
-      .pipe(map(response => {
-        const expenses: Transaction[] = [];
-        response?.data?.forEach((entry: TransactionDB.ResultSet) => expenses.push({
-            id: entry.id,
-            name: entry.name,
-            amount: entry.amount,
-            date: entry.completed_date,
-            details: entry.details,
-            tags: entry.tags
-          })
-        );
-        return expenses;
-      }));
-  }
-
-  private saveExpense(expense: TransactionDB.Save):
-    PostgrestFilterBuilder<Database['public'], Database['public']['Tables']['transactions']['Row'], null, unknown> {
-    return supabase.from('transactions').insert(expense);
-  }
-
-  private updateExpense(expense: TransactionDB.Update):
-    PostgrestFilterBuilder<Database['public'], Database['public']['Tables']['transactions']['Row'], null, unknown> {
-    return supabase.from('transactions').update(expense).eq('id', expense.id);
-  }
-
-  private deleteExpense(id: TransactionDB.Delete):
-    PostgrestFilterBuilder<Database['public'], Database['public']['Tables']['transactions']['Row'], null, unknown> {
-    return supabase.from('transactions').delete().eq('id', id);
   }
 }

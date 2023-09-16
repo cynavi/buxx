@@ -20,7 +20,7 @@
     "@nx/angular": "16.6.0",
     "@supabase/supabase-js": "^2.31.0",
     "bn-ng-idle": "^2.0.5",
-    "chart.js": "^4.3.3",
+    "chart.js": "^4.4.0",
     "chartjs-plugin-zoom": "^2.0.1",
     "date-fns": "^2.30.0",
     "ionicons": "^7.0.0",
