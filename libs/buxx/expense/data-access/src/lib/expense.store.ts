@@ -1,12 +1,12 @@
 import { Database, QueryCriteria, Transaction, TransactionDB } from '@buxx/shared/model';
-import { computed, Injectable, signal, Signal, WritableSignal } from '@angular/core';
+import { computed, inject, Injectable, signal, Signal, WritableSignal } from '@angular/core';
 import { from, map, Observable, Subject, switchMap } from 'rxjs';
-import { InfiniteScrollCustomEvent } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, ToastController } from '@ionic/angular';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PostgrestSingleResponse } from '@supabase/supabase-js';
 import PostgrestFilterBuilder from '@supabase/postgrest-js/dist/module/PostgrestFilterBuilder';
 import { environment, supabase } from '@buxx/shared/app-config';
-import { QueryBuilderUtil, ToastUtil } from '@buxx/shared/util';
+import { SearchUtil, ToastUtil } from '@buxx/shared/util';
 
 interface ExpenseState {
   expenses: Transaction[];
@@ -18,7 +18,9 @@ interface ExpenseState {
 @Injectable()
 export class ExpenseStore {
 
-  range: { from: number, to: number } = {from: 0, to: environment.pageSize};
+  private readonly toastController = inject(ToastController);
+
+  range: { from: number, to: number } = { from: 0, to: environment.pageSize };
   infiniteScroll$: Subject<InfiniteScrollCustomEvent> = new Subject<InfiniteScrollCustomEvent>();
   save$: Subject<TransactionDB.Save> = new Subject<TransactionDB.Save>();
   update$: Subject<TransactionDB.Update> = new Subject<TransactionDB.Update>();
@@ -30,9 +32,9 @@ export class ExpenseStore {
     TransactionDB.ResultSet[], unknown
   > | null> = computed(() => {
     // TODO: Get range from signal??
-    this.range = {from: 0, to: environment.pageSize};
+    this.range = { from: 0, to: environment.pageSize };
     return this.searchCriteria()
-      ? QueryBuilderUtil.buildQuery(this.searchCriteria()!, this.range)
+      ? SearchUtil.buildQuery(this.searchCriteria()!, this.range)
       : null
   });
   private state: WritableSignal<ExpenseState> = signal<ExpenseState>({
@@ -58,9 +60,9 @@ export class ExpenseStore {
     this.infiniteScroll$.pipe(
       takeUntilDestroyed(),
       switchMap((event: InfiniteScrollCustomEvent) => {
-        this.range = {from: this.range.to++, to: this.range.to++ + environment.pageSize};
+        this.range = { from: this.range.to++, to: this.range.to++ + environment.pageSize };
         return this.getExpenses().pipe(
-          map((expenses: Transaction[]) => ({expenses, event}))
+          map((expenses: Transaction[]) => ({ expenses, event }))
         );
       })
     ).subscribe({
@@ -73,7 +75,7 @@ export class ExpenseStore {
       },
       error: err => {
         console.error(err);
-        this.state.update(state => ({...state, error: err}));
+        this.state.update(state => ({ ...state, error: err }));
       }
     });
   }
@@ -83,10 +85,10 @@ export class ExpenseStore {
       takeUntilDestroyed(),
       switchMap((expense: TransactionDB.Save) => from(this.saveExpense(expense)))
     ).subscribe({
-      next: () => ToastUtil.open(`Expense has been saved.`),
+      next: () => ToastUtil.open(`Expense has been saved.`, this.toastController),
       error: err => {
         console.error(err);
-        this.state.update(state => ({...state, error: err}));
+        this.state.update(state => ({ ...state, error: err }));
       }
     });
   }
@@ -95,7 +97,7 @@ export class ExpenseStore {
     this.fetch$.pipe(
       takeUntilDestroyed(),
       switchMap((criteria: QueryCriteria) => {
-          this.state.update(state => ({...state, searchCriteria: criteria, loaded: false}));
+          this.state.update(state => ({ ...state, searchCriteria: criteria, loaded: false }));
           return this.getExpenses();
         }
       )
@@ -109,7 +111,7 @@ export class ExpenseStore {
       },
       error: err => {
         console.error(err);
-        this.state.update(state => ({...state, error: err}));
+        this.state.update(state => ({ ...state, error: err }));
       }
     });
   }
@@ -118,14 +120,14 @@ export class ExpenseStore {
     this.update$.pipe(
       takeUntilDestroyed(),
       switchMap((expense: TransactionDB.Update) => from(this.updateExpense(expense)).pipe(
-        map((response: PostgrestSingleResponse<unknown>) => ({response, expense}))
+        map((response: PostgrestSingleResponse<unknown>) => ({ response, expense }))
       ))
     ).subscribe(data => {
-      const {response, expense} = data;
+      const { response, expense } = data;
       if (response.status === 204) {
-        ToastUtil.open(`Expense has been updated.`).then();
+        ToastUtil.open(`Expense has been updated.`, this.toastController).then();
       } else if (response.error) {
-        this.state.update(state => ({...state, error: response.error.message}));
+        this.state.update(state => ({ ...state, error: response.error.message }));
       }
     });
   }
@@ -134,14 +136,14 @@ export class ExpenseStore {
     this.delete$.pipe(
       takeUntilDestroyed(),
       switchMap(id => from(this.deleteExpense(id)).pipe(
-        map((response: PostgrestSingleResponse<unknown>) => ({response, id}))
+        map((response: PostgrestSingleResponse<unknown>) => ({ response, id }))
       ))
     ).subscribe(data => {
-      const {response, id} = data;
+      const { response, id } = data;
       if (response.status === 204) {
-        ToastUtil.open(`Expense has been deleted.`).then();
+        ToastUtil.open(`Expense has been deleted.`, this.toastController).then();
       } else if (response.error) {
-        this.state.update(state => ({...state, error: response.error.message}));
+        this.state.update(state => ({ ...state, error: response.error.message }));
       }
     });
   }

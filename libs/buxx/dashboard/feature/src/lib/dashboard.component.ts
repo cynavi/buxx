@@ -3,12 +3,13 @@ import { IonicModule, ModalController } from '@ionic/angular';
 import { DogRunningComponent } from '@buxx/shared/ui/dog-running';
 import { CreateNewTransactionComponent } from '@buxx/shared/ui/create-new-transaction';
 import { SearchComponent } from '@buxx/shared/ui/search';
-import { QueryCriteria, TransactionDB } from '@buxx/shared/model';
+import { TransactionDB } from '@buxx/shared/model';
 import { ExpenseStore } from '@buxx/expense/data-access';
 import { IncomeStore } from '@buxx/income/data-access';
+import { SearchUtil } from "@buxx/shared/util";
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'buxx-dashboard',
   templateUrl: './dashboard.component.html',
   imports: [
     IonicModule,
@@ -32,19 +33,9 @@ export class DashboardComponent {
     }
   }
 
-  async openSearchModal(): Promise<void> {
-    const modal: HTMLIonModalElement = await this.modalController.create({
-      component: SearchComponent,
-      componentProps: {
-        searchCriteria: null
-      },
-      backdropDismiss: false,
-      animated: true
-    });
-    modal.present().then();
-    await modal.onWillDismiss().then(overlayEventDetail => {
-      if (overlayEventDetail.role === 'confirm' && overlayEventDetail.data?.searchCriteria satisfies QueryCriteria) {
-      }
-    });
+  openSearchModal(): void {
+    // TODO: Use dashboard store
+    SearchUtil.openSearchModal(this.modalController, this.expenseStore.searchCriteria())
+      .then(queryCriteria => this.expenseStore.fetch$.next(queryCriteria));
   }
 }

@@ -2,7 +2,10 @@
   <ion-toolbar>
     <ion-buttons slot="secondary">
       <app-create-new-transaction [confirmCallback]="emitSaveTransactionEvent.bind(this)"></app-create-new-transaction>
-      <app-search></app-search>
+      <ion-button (click)="openSearchModal()" shape="round">
+        <ion-icon name="search" slot="start"></ion-icon>
+        Search..
+      </ion-button>
     </ion-buttons>
     <ion-title>Dashboard</ion-title>
     <ion-progress-bar type="indeterminate"></ion-progress-bar>

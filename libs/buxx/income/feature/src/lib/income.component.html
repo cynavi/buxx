@@ -2,7 +2,8 @@
   <ion-header>
     <ion-toolbar>
       <ion-buttons slot="secondary">
-        <app-create-new-transaction [confirmCallback]="emitSaveTransactionEvent.bind(this)"></app-create-new-transaction>
+        <app-create-new-transaction
+          [confirmCallback]="emitSaveTransactionEvent.bind(this)"></app-create-new-transaction>
         <ion-button (click)="openSearchModal()" shape="round">
           <ion-icon name="search" slot="start"></ion-icon>
           Search..
@@ -25,7 +26,8 @@
 
     <ion-accordion-group [animateInAnimation]="fadeAnimationUtil.fadeUp()" animateIn>
       <ng-container *ngFor="let income of incomeStore.incomes()">
-        <app-transaction [entry]="income" [isExpense]="false"></app-transaction>
+        <buxx-transaction [entry]="income" [isExpense]="false"
+                          (transactionUpdate$)="updateIncome($event)"></buxx-transaction>
       </ng-container>
     </ion-accordion-group>
     <ion-infinite-scroll (ionInfinite)="onInfiniteScroll($event)">

@@ -23,21 +23,21 @@ export class TransactionSaveUpdateComponent implements OnInit {
 
   @ViewChild('tagInput', { read: ElementRef }) tagRef!: ElementRef;
   entryForm: FormGroup = new FormGroup({});
-  entry!: Transaction;
+  entry: Transaction | undefined;
   tags: string[] = [];
   protected readonly todayDate = (new Date()).toISOString();
   private readonly modalController: ModalController = inject(ModalController);
   private readonly fb: FormBuilder = inject(FormBuilder);
   private readonly authStore: AuthStore = inject(AuthStore);
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.initEntryForm();
     if (this.entry) {
-      this.patchEntryForm(this.entry!);
+      this.patchEntryForm(this.entry);
     }
   }
 
-  cancel() {
+  cancel(): void {
     this.modalController.dismiss(null, 'cancel').then();
   }
 
@@ -52,18 +52,22 @@ export class TransactionSaveUpdateComponent implements OnInit {
     };
 
     let data;
-    if (this.entry) {
-      data = { ...tempEntry, id: this.entry.id, user_id: this.authStore.session()?.user.id! } satisfies TransactionDB.Update;
-    } else {
-      if (this.entryForm.get('saveType')?.value === 'expense') {
-        data = { ...tempEntry, is_expense: true, user_id: this.authStore.session()?.user.id! } satisfies TransactionDB.Save;
-      } else if (this.entryForm.get('saveType')?.value === 'income') {
-        data = { ...tempEntry, is_expense: false, user_id: this.authStore.session()?.user.id! } satisfies TransactionDB.Save;
+    const userId = this.authStore.session()?.user.id;
+    if (userId) {
+      if (this.entry) {
+        data = { ...tempEntry, id: this.entry.id, user_id: userId } satisfies TransactionDB.Update;
       } else {
-        throw new Error('Invalid save type');
+        // if (this.entryForm.get('saveType')?.value === 'expense') {
+        data = { ...tempEntry, user_id: userId } satisfies TransactionDB.Save;
+        // } else if (this.entryForm.get('saveType')?.value === 'income') {
+        //   data = { ...tempEntry, is_expense: false, user_id: this.authStore.session()?.user.id! } satisfies TransactionDB.Save;
+        // } else {
+        //   throw new Error('Invalid save type');
+        // }
       }
+    } else {
+      throw new Error('Unable to find user to save.');
     }
-
     this.modalController.dismiss(data, 'confirm').then();
   }
 

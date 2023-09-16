@@ -4,12 +4,12 @@ import { CommonModule } from '@angular/common';
 import { sub } from 'date-fns';
 import { AnimateInModule, FadeAnimationUtil } from '@buxx/shared/animate-in';
 import { IncomeStore } from '@buxx/income/data-access';
-import { SearchComponent } from '@buxx/shared/ui/search';
 import { CreateNewTransactionComponent } from '@buxx/shared/ui/create-new-transaction';
 import { TransactionComponent } from '@buxx/shared/ui/transaction';
 import { LoadingToolbarComponent } from '@buxx/shared/ui/loading-toolbar';
-import { QueryCriteria, TransactionDB } from '@buxx/shared/model';
+import { TransactionDB } from '@buxx/shared/model';
 import { ExpenseStore } from '@buxx/expense/data-access';
+import { SearchUtil } from "@buxx/shared/util";
 
 @Component({
   selector: 'app-income',
@@ -38,7 +38,7 @@ export class IncomeComponent implements OnInit {
 
   fetchIncome(event?: unknown): void {
     this.incomeStore.fetch$.next({
-      fromDate: sub(new Date(), {days: 30}),
+      fromDate: sub(new Date(), { days: 30 }),
       toDate: new Date()
     });
   }
@@ -55,20 +55,12 @@ export class IncomeComponent implements OnInit {
     }
   }
 
-  async openSearchModal(): Promise<void> {
-    const modal: HTMLIonModalElement = await this.modalController.create({
-      component: SearchComponent,
-      componentProps: {
-        searchCriteria: this.incomeStore.searchCriteria()
-      },
-      backdropDismiss: false,
-      animated: true
-    });
-    modal.present().then();
-    await modal.onWillDismiss().then(overlayEventDetail => {
-      if (overlayEventDetail.role === 'confirm' && overlayEventDetail.data?.searchCriteria satisfies QueryCriteria) {
-        this.incomeStore.fetch$.next(overlayEventDetail.data.searchCriteria);
-      }
-    });
+  updateIncome(income: TransactionDB.Update): void {
+    this.incomeStore.update$.next({ ...income, is_expense: false });
+  }
+
+  openSearchModal(): void {
+    SearchUtil.openSearchModal(this.modalController, this.incomeStore.searchCriteria())
+      .then(queryCriteria => this.incomeStore.fetch$.next(queryCriteria));
   }
 }

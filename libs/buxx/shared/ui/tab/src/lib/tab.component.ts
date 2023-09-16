@@ -19,7 +19,7 @@ export class TabComponent {
 
   openMenu(): void {
     this.menuCtrl.enable(true, 'menu')
-      .then((): Promise<void> =>  this.menuCtrl.open('menu').then());
+      .then((): Promise<void> => this.menuCtrl.open('menu').then());
   }
 
   async signOut(): Promise<void> {

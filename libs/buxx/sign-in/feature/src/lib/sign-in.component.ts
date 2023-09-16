@@ -54,7 +54,7 @@ export class SignInComponent implements OnInit {
   }
 
   signInWithProvider(provider: Provider): void {
-    this.signInStore.signIn$.next({provider});
+    this.signInStore.signIn$.next({ provider });
   }
 
   signUp(): void {

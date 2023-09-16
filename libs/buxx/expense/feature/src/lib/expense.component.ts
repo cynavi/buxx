@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { InfiniteScrollCustomEvent, IonicModule, ModalController } from '@ionic/angular';
 import { ExpenseStore } from '@buxx/expense/data-access';
 import { sub } from 'date-fns';
-import { QueryCriteria, TransactionDB } from '@buxx/shared/model';
+import { TransactionDB } from '@buxx/shared/model';
 import {
   AnimateInModule,
   FadeAnimationUtil,
@@ -13,15 +13,15 @@ import {
 import { LoadingToolbarComponent } from '@buxx/shared/ui/loading-toolbar';
 import { TransactionComponent } from '@buxx/shared/ui/transaction';
 import { CreateNewTransactionComponent } from '@buxx/shared/ui/create-new-transaction';
-import { SearchComponent } from '@buxx/shared/ui/search';
 import { IncomeStore } from '@buxx/income/data-access';
+import { SearchUtil } from "@buxx/shared/util";
 
 
 @Component({
   selector: 'buxx-expense',
   standalone: true,
   templateUrl: './expense.component.html',
-  providers: [ExpenseStore, {provide: ObserverServiceConfig, useValue: observerServiceConfig}],
+  providers: [ExpenseStore, { provide: ObserverServiceConfig, useValue: observerServiceConfig }],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
@@ -45,7 +45,7 @@ export class ExpenseComponent implements OnInit {
 
   fetchExpense(event?: unknown): void {
     this.expenseStore.fetch$.next({
-      fromDate: sub(new Date(), {days: 30}),
+      fromDate: sub(new Date(), { days: 30 }),
       toDate: new Date()
     });
   }
@@ -62,20 +62,12 @@ export class ExpenseComponent implements OnInit {
     }
   }
 
-  async openSearchModal(): Promise<void> {
-    const modal: HTMLIonModalElement = await this.modalController.create({
-      component: SearchComponent,
-      componentProps: {
-        searchCriteria: this.expenseStore.searchCriteria()
-      },
-      backdropDismiss: false,
-      animated: true
-    });
-    modal.present().then();
-    await modal.onWillDismiss().then(overlayEventDetail => {
-      if (overlayEventDetail.role === 'confirm' && overlayEventDetail.data?.searchCriteria satisfies QueryCriteria) {
-        this.expenseStore.fetch$.next(overlayEventDetail.data.searchCriteria);
-      }
-    });
+  updateExpense(expense: TransactionDB.Update): void {
+    this.expenseStore.update$.next({ ...expense, is_expense: true });
+  }
+
+  openSearchModal(): void {
+    SearchUtil.openSearchModal(this.modalController, this.expenseStore.searchCriteria())
+      .then(queryCriteria => this.expenseStore.fetch$.next(queryCriteria));
   }
 }

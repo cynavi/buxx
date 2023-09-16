@@ -13,7 +13,7 @@ import { IncomeStore } from '@buxx/income/data-access';
 })
 export class CreateNewTransactionComponent {
 
-  @Input({required: true}) confirmCallback!: (transaction: TransactionDB.Save) => void;
+  @Input({ required: true }) confirmCallback!: (transaction: TransactionDB.Save) => void;
 
   private readonly modalController: ModalController = inject(ModalController);
   private readonly expenseStore: ExpenseStore = inject(ExpenseStore);

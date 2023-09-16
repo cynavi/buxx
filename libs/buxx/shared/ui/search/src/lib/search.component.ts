@@ -6,14 +6,14 @@ import { PositiveNumberOnlyDirective } from '@buxx/shared/directive';
 import { QueryCriteria } from '@buxx/shared/model';
 
 @Component({
-  selector: 'app-search',
+  selector: 'buxx-search',
   templateUrl: './search.component.html',
   imports: [IonicModule, ReactiveFormsModule, CommonModule, PositiveNumberOnlyDirective, DatePipe],
   standalone: true
 })
 export class SearchComponent implements OnInit {
 
-  @ViewChild('tagInput', {read: ElementRef}) tagRef!: ElementRef;
+  @ViewChild('tagInput', { read: ElementRef }) tagRef!: ElementRef;
   searchCriteria!: QueryCriteria;
   searchForm!: FormGroup;
   tags: string[] = [];
@@ -40,7 +40,7 @@ export class SearchComponent implements OnInit {
         toDate: new Date(this.searchForm.value.toDate),
         tags: this.tags
       };
-      this.modalController.dismiss({searchCriteria}, 'confirm').then();
+      this.modalController.dismiss({ searchCriteria }, 'confirm').then();
     }
   }
 

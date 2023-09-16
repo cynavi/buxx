@@ -1,14 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AlertButton, AlertController, IonicModule, ModalController } from '@ionic/angular';
-import { Transaction } from '@buxx/shared/model';
+import { Transaction, TransactionDB } from '@buxx/shared/model';
 import { ExpenseStore } from '@buxx/expense/data-access';
 import { TransactionSaveUpdateComponent } from '@buxx/shared/ui/transaction-save-update';
 import { IncomeStore } from '@buxx/income/data-access';
 import { ToDateModule } from '@buxx/shared/pipe';
 
 @Component({
-  selector: 'app-transaction',
+  selector: 'buxx-transaction',
   standalone: true,
   imports: [CommonModule, IonicModule, ToDateModule],
   templateUrl: './transaction.component.html',
@@ -19,6 +19,7 @@ export class TransactionComponent {
 
   @Input({ required: true }) entry!: Transaction;
   @Input({ required: true }) isExpense: boolean = false;
+  @Output() transactionUpdate$ = new EventEmitter<TransactionDB.Update>();
 
   private readonly modalController: ModalController = inject(ModalController);
   private readonly alertController: AlertController = inject(AlertController);
@@ -36,11 +37,12 @@ export class TransactionComponent {
     await modal.onWillDismiss()
       .then(overlayEventDetail => {
         if (overlayEventDetail.role === 'confirm' && overlayEventDetail.data) {
-          if (this.isExpense) {
-            this.expenseStore.update$.next({ ...overlayEventDetail.data, is_expense: true });
-          } else {
-            this.incomeStore.update$.next({ ...overlayEventDetail.data, is_expense: false });
-          }
+          this.transactionUpdate$.next(overlayEventDetail.data);
+          // if (this.isExpense) {
+          //   this.expenseStore.update$.next({ ...overlayEventDetail.data, is_expense: true });
+          // } else {
+          //   this.incomeStore.update$.next({ ...overlayEventDetail.data, is_expense: false });
+          // }
         }
       });
   }

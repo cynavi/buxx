@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { DatePipe, NgForOf } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -40,6 +40,7 @@ export class SignUpComponent implements OnInit {
   errMessage: string | null = null;
   private readonly fb: FormBuilder = inject(FormBuilder);
   private readonly router: Router = inject(Router);
+  private readonly toastController = inject(ToastController);
 
   ngOnInit(): void {
     this.initSignUpForm();
@@ -64,7 +65,7 @@ export class SignUpComponent implements OnInit {
       }
     });
     if (data.user) {
-      ToastUtil.open('Sign Up successful. Confirm your email to continue.').then();
+      ToastUtil.open('Sign Up successful. Confirm your email to continue.', this.toastController).then();
       this.router.navigate(['signin']).then();
     }
     if (error?.message) {
