@@ -1,0 +1,30 @@
+<div class="h-screen flex items-center justify-center">
+	<div class="flex flex-col w-3/12 md:w-5/12 sm:w-11/12" [formGroup]="signInForm">
+		<mat-form-field class="">
+			<mat-label>Email</mat-label>
+			<input type="email" matInput formControlName="email" [errorStateMatcher]="matcher"
+			       placeholder="Ex. pat@example.com">
+			@if (email.hasError('email') && !email.hasError('required')) {
+				<mat-error>Please enter a valid email address</mat-error>
+			}
+			@if (email.hasError('required')) {
+				<mat-error>Email is <strong>required</strong></mat-error>
+			}
+		</mat-form-field>
+
+		<mat-form-field>
+			<mat-label>Password</mat-label>
+			<input matInput [type]="hide ? 'password' : 'text'" formControlName="password">
+			<button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
+			        [attr.aria-pressed]="hide">
+				<mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+			</button>
+		</mat-form-field>
+
+		<button mat-stroked-button
+		        color="primary"
+		        (click)="signIn()"
+		        [disabled]="!signInForm.valid">{{ signInStore.loaded() ? 'Sign In' : 'Signing In...' }}
+		</button>
+	</div>
+</div>

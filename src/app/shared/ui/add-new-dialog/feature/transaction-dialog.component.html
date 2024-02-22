@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>New Transaction</h2>
+<mat-dialog-content>
+	<div [formGroup]="addNewForm" class="flex flex-col">
+		<mat-form-field>
+			<mat-label>Name</mat-label>
+			<input matInput formControlName="name" required />
+		</mat-form-field>
+
+		<mat-form-field>
+			<mat-label>Amount</mat-label>
+			<input matInput formControlName="amount" required />
+		</mat-form-field>
+
+		<mat-form-field>
+			<mat-label>Date</mat-label>
+			<input matInput [matDatepicker]="picker" formControlName="date" required>
+			<mat-hint>MM/DD/YYYY</mat-hint>
+			<mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+			<mat-datepicker #picker></mat-datepicker>
+		</mat-form-field>
+
+		<mat-form-field>
+			<mat-label>Type</mat-label>
+			<mat-select [value]="false" formControlName="isExpense" required>
+					<mat-option [value]="false">Income</mat-option>
+					<mat-option [value]="true">Expense</mat-option>
+			</mat-select>
+		</mat-form-field>
+
+		<mat-form-field>
+			<mat-label>Details</mat-label>
+			<textarea matInput formControlName="details"></textarea>
+		</mat-form-field>
+	</div>
+</mat-dialog-content>
+<mat-dialog-actions>
+	<button mat-button (click)="closDialog(false)">Cancel</button>
+	<button mat-button (click)="closDialog(true)" [disabled]="!addNewForm.valid">Save</button>
+</mat-dialog-actions>

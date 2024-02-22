@@ -1,0 +1,17 @@
+<mat-toolbar>
+	<mat-toolbar-row>
+		<a mat-button routerLink=""><span class="text-xl">Buxx</span></a>
+		<span class="spacer"></span>
+		<button mat-fab extended color="primary" (click)="openAddDialog()">
+			<mat-icon>add</mat-icon>
+			Add New
+		</button>
+		<button mat-icon-button [matMenuTriggerFor]="menu" >
+			<mat-icon>menu</mat-icon>
+		</button>
+	</mat-toolbar-row>
+	<mat-menu #menu="matMenu">
+		<button mat-menu-item>Profile</button>
+		<button mat-menu-item>Sign Out</button>
+	</mat-menu>
+</mat-toolbar>
