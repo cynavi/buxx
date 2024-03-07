@@ -1,1 +1,35 @@
 <as-toolbar (newTransactionEmitter)="saveTransaction($event)"></as-toolbar>
+<div class="flex items-center justify-center">
+	<mat-accordion class="flex flex-col w-3/4 bg">
+		@for (transaction of transactionsObs | async; track transaction.id) {
+			<mat-expansion-panel class="w-full bg">
+				<mat-expansion-panel-header>
+					<mat-panel-title>
+						<span class="mr-1">
+							@if (transaction.isExpense) {
+								<mat-icon class="negative">trending_down</mat-icon>
+							} @else {
+								<mat-icon class="positive">trending_up</mat-icon>
+							}
+						</span>
+						{{transaction.name}}
+					</mat-panel-title>
+					<mat-panel-description>Rs. {{transaction.amount}}</mat-panel-description>
+					<mat-panel-description>
+						{{transaction.date | date: 'mediumDate' }}
+					</mat-panel-description>
+				</mat-expansion-panel-header>
+				<div class="todo-action">
+					<button mat-button color="accent" (click)="updateTransaction()">Update</button>
+					<button mat-button color="warn" (click)="deleteTransaction()">Delete</button>
+				</div>
+				<p>{{transaction.details}}</p>
+			</mat-expansion-panel>
+		}
+		<mat-paginator class="bg"
+		               aria-label="Select page"
+		               [pageSize]="10"
+		               (page)="change($event)"
+		></mat-paginator>
+	</mat-accordion>
+</div>

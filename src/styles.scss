@@ -9,5 +9,13 @@ html, body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  background-color: #282828;
+  background-color: #212121;
+}
+
+.positive {
+  color: #037971;
+}
+
+.negative {
+  color: #6f1a07;
 }

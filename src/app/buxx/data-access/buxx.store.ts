@@ -72,7 +72,7 @@ export class BuxxStore {
       switchMap((criteria: Query) => {
         let query: PostgrestFilterBuilder<BuxxSchema, BuxxRow, Transaction[], unknown> = supabase
           .from(TRANSACTIONS)
-          .select('id, name, details, date, isExpense, userId');
+          .select('id, name, details, date, isExpense, userId, amount');
         if (criteria.name) {
           query = query.ilike('name', `%${criteria.name}%`);
         }
