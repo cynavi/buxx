@@ -28,6 +28,7 @@
 		}
 		<mat-paginator class="bg"
 		               aria-label="Select page"
+		               [pageSizeOptions]="[10, 20, 30, 50]"
 		               [pageSize]="10"
 		               (page)="change($event)"
 		></mat-paginator>

@@ -11,7 +11,6 @@
 		</button>
 	</mat-toolbar-row>
 	<mat-menu #menu="matMenu">
-		<button mat-menu-item>Profile</button>
-		<button mat-menu-item>Sign Out</button>
+		<button mat-menu-item (click)="signOut()">Sign Out</button>
 	</mat-menu>
 </mat-toolbar>

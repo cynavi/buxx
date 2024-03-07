@@ -119,10 +119,10 @@ export class BuxxStore {
       switchMap((transaction: SaveTransaction) => from(supabase.from(TRANSACTIONS).insert(transaction)))
     ).subscribe({
       next: () => {
-        this.snackBar.open('Transaction has been saved')
+        this.snackBar.open('Transaction has been saved.', undefined, { duration: 3000 });
       },
       error: err => {
-        this.state.update(state => ({...state, error: err}))
+        this.state.update(state => ({ ...state, error: err }));
       }
     });
   }
@@ -134,10 +134,10 @@ export class BuxxStore {
       switchMap((transaction: UpdateTransaction) => from(supabase.from(TRANSACTIONS).update(transaction)))
     ).subscribe({
       next: () => {
-        this.snackBar.open('Transaction has been updated')
+        this.snackBar.open('Transaction has been updated.', undefined, { duration: 3000 });
       },
       error: err => {
-        this.state.update(state => ({...state, error: err}))
+        this.state.update(state => ({ ...state, error: err }));
       }
     });
   }
@@ -148,10 +148,10 @@ export class BuxxStore {
       switchMap((id: DeleteTransaction) => from(supabase.from(TRANSACTIONS).delete().eq('id', id)))
     ).subscribe({
       next: () => {
-        this.snackBar.open('Transaction has been updated')
+        this.snackBar.open('Transaction has been deleted.', undefined, { duration: 3000 });
       },
       error: err => {
-        this.state.update(state => ({...state, error: err}))
+        this.state.update(state => ({ ...state, error: err }));
       }
     });
   }
