@@ -1,33 +1,115 @@
 <as-toolbar (newTransactionEmitter)="saveTransaction($event)"></as-toolbar>
-<div class="flex items-center justify-center">
-	<mat-accordion class="flex flex-col w-3/4 bg">
+<div class="flex flex-col items-center justify-center">
+	<div class="flex flex-row sm:flex-col sm:min-w-11/12">
+		<mat-card class="w-64 h-40 mb-2 mr-2 items-center justify-center sm:min-w-full sm:mr-0">
+			<mat-card-header>
+				<mat-card-title>Rs. 874</mat-card-title>
+				<mat-card-subtitle>
+					<mat-icon class="positive scale-150 mt-2 mr-2">arrow_upward_alt</mat-icon>overall
+				</mat-card-subtitle>
+			</mat-card-header>
+		</mat-card>
+
+		<mat-card class="w-64 h-40 mb-2 mr-2 items-center justify-center sm:min-w-full sm:mr-0">
+			<mat-card-header>
+				<mat-card-title>Rs. 8745</mat-card-title>
+				<mat-card-subtitle>
+					<mat-icon class="positive scale-150 mt-2 mr-2">arrow_upward_alt</mat-icon>income
+				</mat-card-subtitle>
+			</mat-card-header>
+		</mat-card>
+
+		<mat-card class="w-64 h-40 mb-2 mr-2 items-center justify-center sm:min-w-full sm:mr-0">
+			<mat-card-header>
+					<mat-card-title>Rs. 78237</mat-card-title>
+					<mat-card-subtitle>
+						<mat-icon class="negative scale-150 mt-2 mr-2">arrow_downward_alt</mat-icon>expense
+					</mat-card-subtitle>
+			</mat-card-header>
+		</mat-card>
+	</div>
+
+	<mat-accordion class="flex flex-col w-3/4 sm:min-w-11/12 sm:mx-14">
+		<mat-expansion-panel class="w-full  sm:mx-14" [expanded]="false">
+			<mat-expansion-panel-header>
+				<mat-panel-title class="text-lg">
+					<mat-icon class="mr-2">tune</mat-icon>
+					Filter
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+			<div class="flex flex-col" [formGroup]="queryForm">
+				<div>
+					<mat-form-field>
+						<mat-label>Date Between</mat-label>
+						<mat-date-range-input [rangePicker]="picker">
+							<input matStartDate formControlName="fromDate" placeholder="Start date">
+							<input matEndDate formControlName="toDate" placeholder="End date">
+						</mat-date-range-input>
+						<mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+						<mat-date-range-picker #picker></mat-date-range-picker>
+
+						@if (queryForm.controls['toDate'].hasError('matStartDateInvalid')) {
+							<mat-error>Invalid start date</mat-error>
+						}
+						@if (queryForm.controls['fromDate'].hasError('matEndDateInvalid')) {
+							<mat-error>Invalid end date</mat-error>
+						}
+					</mat-form-field>
+				</div>
+				<div formGroupName="amount">
+					<mat-form-field class="mr-2">
+						<mat-label>Amount</mat-label>
+						<mat-select formControlName="operator">
+							<mat-option value="<">less than</mat-option>
+							<mat-option value="<=">less than or equals</mat-option>
+							<mat-option value="==">equals</mat-option>
+							<mat-option value="!=">not equals</mat-option>
+							<mat-option value=">">greater than</mat-option>
+							<mat-option value=">=">greater than or equals</mat-option>
+						</mat-select>
+					</mat-form-field>
+					<mat-form-field>
+						<mat-label>Value</mat-label>
+						<input matInput formControlName="value">
+					</mat-form-field>
+				</div>
+				<div>
+					<mat-form-field>
+						<mat-label>Name Contains</mat-label>
+						<input matInput formControlName="name">
+					</mat-form-field>
+				</div>
+			</div>
+			<button mat-button color="accent" (click)="updateTransaction()">Apply</button>
+		</mat-expansion-panel>
+
 		@for (transaction of transactionsObs | async; track transaction.id) {
-			<mat-expansion-panel class="w-full bg">
+			<mat-expansion-panel class="w-full">
 				<mat-expansion-panel-header>
 					<mat-panel-title>
-						<span class="mr-1">
+						<span class="mr-4 font-bold">
 							@if (transaction.isExpense) {
 								<mat-icon class="negative">trending_down</mat-icon>
 							} @else {
 								<mat-icon class="positive">trending_up</mat-icon>
 							}
 						</span>
-						{{transaction.name}}
+						{{ transaction.name }}
 					</mat-panel-title>
-					<mat-panel-description>Rs. {{transaction.amount}}</mat-panel-description>
+					<mat-panel-description>Rs. {{ transaction.amount }}</mat-panel-description>
 					<mat-panel-description>
-						{{transaction.date | date: 'mediumDate' }}
+						{{ transaction.date | date: 'mediumDate' }}
 					</mat-panel-description>
 				</mat-expansion-panel-header>
-				<div class="todo-action">
-					<button mat-button color="accent" (click)="updateTransaction()">Update</button>
+				<div class="flex flex-row float-right sm:flex-col sm:float-none">
+					<button mat-button color="accent" class="sm:mb-2" (click)="updateTransaction()">Update</button>
 					<button mat-button color="warn" (click)="deleteTransaction()">Delete</button>
 				</div>
-				<p>{{transaction.details}}</p>
+				<p>{{ transaction.details }}</p>
 			</mat-expansion-panel>
 		}
-		<mat-paginator class="bg"
-		               aria-label="Select page"
+
+		<mat-paginator aria-label="Select page"
 		               [pageSizeOptions]="[10, 20, 30, 50]"
 		               [pageSize]="10"
 		               (page)="change($event)"
