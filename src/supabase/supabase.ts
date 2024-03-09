@@ -40,13 +40,13 @@ export type Database = {
           userId: string
         }
         Update: {
-          amount?: number
-          date?: string
-          details?: string | null
-          id?: string
-          isExpense?: boolean
-          name?: string
-          userId?: string
+          amount: number
+          date: string
+          details: string | null
+          id: string
+          isExpense: boolean
+          name: string
+          userId: string
         }
         Relationships: [
           {

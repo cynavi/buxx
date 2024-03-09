@@ -9,7 +9,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { ToolbarComponent } from '../../shared/ui/toolbar/feature/toolbar.component';
-import { Operator, SaveTransaction, Transaction } from '../../shared/model/buxx.model';
+import { DeleteTransaction, Operator, SaveTransaction, Transaction } from '../../shared/model/buxx.model';
 import { BuxxStore } from '../data-access/buxx.store';
 import { MatCardModule } from '@angular/material/card';
 import { AsyncPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
@@ -35,6 +35,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { sub } from 'date-fns';
+import { TransactionDialogComponent } from '../../shared/ui/add-new-dialog/feature/transaction-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 export const dateRangeValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const toDate = control.get('toDate');
@@ -75,6 +77,7 @@ export class BuxxComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   private readonly store = inject(BuxxStore);
   private readonly fb = inject(FormBuilder);
+  private readonly dialog = inject(MatDialog);
 
   private dataSource: MatTableDataSource<Transaction> = new MatTableDataSource<Transaction>([]);
   transactions$: Observable<Transaction[]> = toObservable(computed(() => this.store.data().transactions));
@@ -119,16 +122,27 @@ export class BuxxComponent implements OnInit, OnDestroy {
     }, { validators: [dateRangeValidator] });
   }
 
+  applyFilter(): void {
+
+  }
+
   saveTransaction(transaction: SaveTransaction): void {
     this.store.save$.next(transaction);
   }
 
-  updateTransaction(): void {
-
+  updateTransaction(transaction: Transaction): void {
+    const dialogRef = this.dialog.open(TransactionDialogComponent, {
+      data: transaction
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.update$.next(result);
+      }
+    });
   }
 
-  deleteTransaction(): void {
-
+  deleteTransaction(transactionId: DeleteTransaction): void {
+    this.store.delete$.next(transactionId);
   }
 
   paginate(event: PageEvent): void {

@@ -1,6 +1,6 @@
-<h2 mat-dialog-title>New Transaction</h2>
+<h2 mat-dialog-title>{{ data ? 'Update Transaction' : 'Add New Transaction' }}</h2>
 <mat-dialog-content>
-	<div [formGroup]="addNewForm" class="flex flex-col">
+	<div [formGroup]="transactionForm" class="flex flex-col">
 		<mat-form-field>
 			<mat-label>Name</mat-label>
 			<input matInput formControlName="name" required />
@@ -35,5 +35,7 @@
 </mat-dialog-content>
 <mat-dialog-actions>
 	<button mat-button (click)="closDialog(false)">Cancel</button>
-	<button mat-button (click)="closDialog(true)" [disabled]="!addNewForm.valid">Save</button>
+	<button mat-button (click)="closDialog(true)" [disabled]="!transactionForm.valid">
+		{{ data ? 'Update' : 'Save' }}
+	</button>
 </mat-dialog-actions>

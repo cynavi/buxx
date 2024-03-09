@@ -19,7 +19,7 @@ import { supabase } from '../../../../../supabase/supabase';
 })
 export class ToolbarComponent {
 
-  readonly dialog = inject(MatDialog);
+  private readonly dialog = inject(MatDialog);
   private readonly authStore = inject(AuthStore);
   private readonly router = inject(Router);
   @Output() newTransactionEmitter = new EventEmitter<SaveTransaction>();

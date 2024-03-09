@@ -80,7 +80,7 @@
 					</mat-form-field>
 				</div>
 			</div>
-			<button mat-button color="accent" (click)="updateTransaction()">Apply</button>
+			<button mat-button color="accent" (click)="applyFilter()">Apply</button>
 		</mat-expansion-panel>
 
 		@for (transaction of transactions$ | async; track transaction.id) {
@@ -102,8 +102,8 @@
 					</mat-panel-description>
 				</mat-expansion-panel-header>
 				<div class="flex flex-row float-right sm:flex-col sm:float-none">
-					<button mat-button color="accent" class="sm:mb-2" (click)="updateTransaction()">Update</button>
-					<button mat-button color="warn" (click)="deleteTransaction()">Delete</button>
+					<button mat-button color="accent" class="sm:mb-2" (click)="updateTransaction(transaction)">Update</button>
+					<button mat-button color="warn" (click)="deleteTransaction(transaction.id)">Delete</button>
 				</div>
 				<p>{{ transaction.details }}</p>
 			</mat-expansion-panel>

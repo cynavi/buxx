@@ -46,7 +46,7 @@ const initialState: BuxxState = {
       isNext: true
     }
   }
-}
+};
 
 @Injectable()
 export class BuxxStore {
@@ -114,7 +114,11 @@ export class BuxxStore {
   private handleUpdate() {
     this.update$.pipe(
       takeUntilDestroyed(),
-      switchMap((transaction: UpdateTransaction) => from(supabase.from(TRANSACTIONS).update(transaction)))
+      switchMap((transaction: UpdateTransaction) => from(supabase
+        .from(TRANSACTIONS)
+        .update(transaction)
+        .eq('id', transaction.id)
+      ))
     ).subscribe({
       next: () => {
         this.snackBar.open('Transaction has been updated.', undefined, { duration: 3000 });
