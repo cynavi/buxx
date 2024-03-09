@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 import {
-  DeleteTransaction, Query,
+  DeleteTransaction,
+  Query,
   SaveTransaction,
   Transaction,
   TRANSACTIONS,
@@ -8,22 +9,42 @@ import {
 } from '../../shared/model/buxx.model';
 import { from, Subject, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BuxxRow, BuxxSchema, supabase } from '../../../supabase/supabase';
+import { supabase } from '../../../supabase/supabase';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { format, sub } from 'date-fns';
+import { sub } from 'date-fns';
 import { AuthStore } from '../../shared/data-access/auth/auth.store';
-import PostgrestFilterBuilder from '@supabase/postgrest-js/dist/module/PostgrestFilterBuilder';
 import { PostgrestSingleResponse } from '@supabase/supabase-js';
-
+import { buildFilter } from '../../shared/util/filter-builder';
 
 type BuxxState = {
   loaded: boolean;
-  transactions: Transaction[];
-  error: string | null;
-  query: Query | null;
-  paginate: {
+  data: {
+    transactions: Transaction[];
     count: number;
-    pointer: number;
+  },
+  error: string | null;
+  query: Query;
+}
+
+const initialState: BuxxState = {
+  loaded: true,
+  data: {
+    transactions: [],
+    count: 0
+  },
+  error: null,
+  query: {
+    amount: {
+      op: '<=',
+      value: 50000
+    },
+    fromDate: sub(new Date(), { days: 30 }),
+    toDate: new Date(),
+    paginate: {
+      pageSize: 5,
+      pointer: 0,
+      isNext: true
+    }
   }
 }
 
@@ -32,26 +53,11 @@ export class BuxxStore {
 
   private readonly snackBar = inject(MatSnackBar);
   private readonly authStore = inject(AuthStore);
-  private state: WritableSignal<BuxxState> = signal({
-    loaded: true,
-    transactions: [],
-    error: null,
-    query: {
-      amount: {
-        op: '<=',
-        value: 50000
-      },
-      fromDate: sub(new Date(), { days: 30 }),
-      toDate: new Date()
-    },
-    paginate: {
-      count: 20,
-      pointer: 0
-    }
-  });
+  private state: WritableSignal<BuxxState> = signal(initialState);
 
   loaded: Signal<boolean> = computed(() => this.state().loaded);
-  transactions: Signal<Transaction[]> = computed(() => this.state().transactions);
+  data: Signal<{ transactions: Transaction[]; count: number; }> = computed(() => this.state().data);
+  query: Signal<Query> = computed(() => this.state().query);
   error: Signal<string | null> = computed(() => this.state().error);
 
   fetch$: Subject<Query> = new Subject<Query>();
@@ -66,50 +72,28 @@ export class BuxxStore {
     this.handleDelete();
   }
 
-  private handleFetch() {
+  private handleFetch(): void {
     this.fetch$.pipe(
       takeUntilDestroyed(),
-      switchMap((criteria: Query) => {
-        let query: PostgrestFilterBuilder<BuxxSchema, BuxxRow, Transaction[], unknown> = supabase
-          .from(TRANSACTIONS)
-          .select('id, name, details, date, isExpense, userId, amount');
-        if (criteria.name) {
-          query = query.ilike('name', `%${criteria.name}%`);
-        }
-        if (criteria.amount?.value && criteria.amount?.op) {
-          switch (criteria.amount.op) {
-            case '<':
-              query = query.lt('amount', criteria.amount.value);
-              break;
-            case '<=':
-              query = query.lte('amount', criteria.amount.value);
-              break;
-            case '==':
-              query = query.eq('amount', criteria.amount.value);
-              break;
-            case '!=':
-              query = query.neq('amount', criteria.amount.value);
-              break;
-            case '>':
-              query = query.gt('amount', criteria.amount.value);
-              break;
-            case '>=':
-              query = query.gte('amount', criteria.amount.value);
-              break;
-            default:
-              throw Error('Invalid operator on amount.');
-          }
-        }
-        if (criteria.fromDate && criteria.toDate) {
-          query = query.gte('date', format(criteria.fromDate, 'yyyy-MM-dd'))
-            .lte('date', format(criteria.toDate, 'yyyy-MM-dd HH:mm:ss'));
-        }
-        query = query.eq('userId', this.authStore.session()?.user.id!);
-        return from(query);
-      })
+      switchMap((query: Query) => from(buildFilter(query, this.authStore.session()?.user.id!)))
     ).subscribe((response: PostgrestSingleResponse<Transaction[]>) => {
       const transactions: Transaction[] = response?.data ?? [];
-      console.log(transactions);
+      this.state.update(state => ({
+        ...state,
+        data: {
+          transactions,
+          count: response.count ?? 0
+        },
+        query: {
+          ...state.query,
+          paginate: {
+            ...state.query.paginate,
+            pointer: state.query.paginate.isNext
+              ? state.query.paginate.pointer + state.query.paginate.pageSize
+              : state.query.paginate.pointer - state.query.paginate.pageSize
+          }
+        }
+      }));
     });
   }
 
@@ -126,7 +110,6 @@ export class BuxxStore {
       }
     });
   }
-
 
   private handleUpdate() {
     this.update$.pipe(

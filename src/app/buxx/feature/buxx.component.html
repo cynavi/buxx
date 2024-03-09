@@ -37,7 +37,7 @@
 					Filter
 				</mat-panel-title>
 			</mat-expansion-panel-header>
-			<div class="flex flex-col" [formGroup]="queryForm">
+			<div class="flex flex-col" [formGroup]="filterForm">
 				<div>
 					<mat-form-field>
 						<mat-label>Date Between</mat-label>
@@ -48,10 +48,10 @@
 						<mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
 						<mat-date-range-picker #picker></mat-date-range-picker>
 
-						@if (queryForm.controls['toDate'].hasError('matStartDateInvalid')) {
+						@if (filterForm.controls['toDate'].hasError('matStartDateInvalid')) {
 							<mat-error>Invalid start date</mat-error>
 						}
-						@if (queryForm.controls['fromDate'].hasError('matEndDateInvalid')) {
+						@if (filterForm.controls['fromDate'].hasError('matEndDateInvalid')) {
 							<mat-error>Invalid end date</mat-error>
 						}
 					</mat-form-field>
@@ -83,7 +83,7 @@
 			<button mat-button color="accent" (click)="updateTransaction()">Apply</button>
 		</mat-expansion-panel>
 
-		@for (transaction of transactionsObs | async; track transaction.id) {
+		@for (transaction of transactions$ | async; track transaction.id) {
 			<mat-expansion-panel class="w-full">
 				<mat-expansion-panel-header>
 					<mat-panel-title>
@@ -110,9 +110,10 @@
 		}
 
 		<mat-paginator aria-label="Select page"
-		               [pageSizeOptions]="[10, 20, 30, 50]"
-		               [pageSize]="10"
-		               (page)="change($event)"
+		               [pageSizeOptions]="[5, 10, 20, 30, 50]"
+		               [pageSize]="5"
+		               [length]="paginatorLength"
+		               (page)="paginate($event)"
 		></mat-paginator>
 	</mat-accordion>
 </div>

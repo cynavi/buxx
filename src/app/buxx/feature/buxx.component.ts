@@ -1,4 +1,13 @@
-import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { ToolbarComponent } from '../../shared/ui/toolbar/feature/toolbar.component';
 import { Operator, SaveTransaction, Transaction } from '../../shared/model/buxx.model';
 import { BuxxStore } from '../data-access/buxx.store';
@@ -6,9 +15,7 @@ import { MatCardModule } from '@angular/material/card';
 import { AsyncPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { AuthStore } from '../../shared/data-access/auth/auth.store';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { API_DATA } from './transactions-mock';
 import { Observable } from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,6 +33,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { sub } from 'date-fns';
 
 export const dateRangeValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const toDate = control.get('toDate');
@@ -58,23 +67,48 @@ export const dateRangeValidator: ValidatorFn = (control: AbstractControl): Valid
   ],
   templateUrl: './buxx.component.html',
   styleUrl: './buxx.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [BuxxStore]
 })
 export class BuxxComponent implements OnInit, OnDestroy {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   private readonly store = inject(BuxxStore);
-  readonly authStore = inject(AuthStore);
-  private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private readonly fb = inject(FormBuilder);
 
-  dataSource: MatTableDataSource<Transaction> = new MatTableDataSource<Transaction>(API_DATA);
-  transactionsObs!: Observable<Transaction[]>;
-  transactions: Transaction[] = API_DATA;
-  queryForm!: FormGroup;
+  private dataSource: MatTableDataSource<Transaction> = new MatTableDataSource<Transaction>([]);
+  transactions$: Observable<Transaction[]> = toObservable(computed(() => this.store.data().transactions));
+  filterForm!: FormGroup;
+  paginatorLength!: number;
+
+  constructor() {
+    effect(() => {
+      const data = this.store.data();
+      this.dataSource.data = data.transactions;
+      this.paginatorLength = data.count;
+    });
+  }
 
   ngOnInit(): void {
-    this.queryForm = this.fb.group({
+    this.initQueryForm();
+    this.dataSource.paginator = this.paginator;
+    this.store.fetch$.next({
+      amount: {
+        op: '<=',
+        value: 500
+      },
+      fromDate: sub(new Date(), { days: 30 }),
+      toDate: new Date(),
+      paginate: {
+        pageSize: 5,
+        pointer: 0,
+        isNext: true
+      }
+    });
+  }
+
+  initQueryForm(): void {
+    this.filterForm = this.fb.group({
       toDate: this.fb.control<Date | null>(null),
       fromDate: this.fb.control<Date | null>(null),
       amount: this.fb.group({
@@ -83,17 +117,6 @@ export class BuxxComponent implements OnInit, OnDestroy {
       }),
       name: this.fb.control<string | null>(null)
     }, { validators: [dateRangeValidator] });
-    this.changeDetectorRef.detectChanges();
-    this.dataSource.paginator = this.paginator;
-    this.transactionsObs = this.dataSource.connect();
-    // this.store.fetch$.next({
-    // amount: {
-    //   op: '<=',
-    //   value: 50000
-    // },
-    // fromDate: sub(new Date(), { days: 30 }),
-    // toDate: new Date()
-    // });
   }
 
   saveTransaction(transaction: SaveTransaction): void {
@@ -108,12 +131,26 @@ export class BuxxComponent implements OnInit, OnDestroy {
 
   }
 
-  change(event: PageEvent) {
-
-  }
-
-  filter() {
-
+  paginate(event: PageEvent): void {
+    if (event.previousPageIndex! < event.pageIndex) {
+      this.store.fetch$.next({
+        ...this.store.query(),
+        paginate: {
+          pageSize: event.pageSize,
+          pointer: this.store.query().paginate.pointer,
+          isNext: true
+        }
+      });
+    } else {
+      this.store.fetch$.next({
+        ...this.store.query(),
+        paginate: {
+          pageSize: event.pageSize,
+          pointer: this.store.query().paginate.pointer,
+          isNext: false
+        }
+      });
+    }
   }
 
   ngOnDestroy() {
