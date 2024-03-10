@@ -28,4 +28,11 @@ export type Paginate = {
   pointer: number;
   isNext: boolean;
 };
+
 export type Operator = '<' | '<=' | '==' | '!=' | '>' | '>=';
+
+export type Summary = {
+  balance: number,
+  income: number,
+  expense: number
+};

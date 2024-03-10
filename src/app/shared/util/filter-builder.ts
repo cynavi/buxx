@@ -48,7 +48,7 @@ const buildAmountFilter = (query: BuxxFilterBuilder, amount: Amount): BuxxFilter
 
 const buildDateRangeFilter = (query: BuxxFilterBuilder, fromDate: Date, toDate: Date): BuxxFilterBuilder => {
   query = query.gte('date', format(fromDate, 'yyyy-MM-dd'))
-    .lte('date', format(toDate, 'yyyy-MM-dd HH:mm:ss'));
+    .lte('date', format(toDate, 'yyyy-MM-dd'));
   return query;
 };
 

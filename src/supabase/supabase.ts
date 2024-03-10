@@ -63,7 +63,90 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      getTotalIncomeAndExpense:
+        | {
+        Args: {
+          ownerId: string
+          amountValue: number
+          amountOperator: string
+        }
+        Returns: {
+          expense: number
+          income: number
+        }[]
+      }
+        | {
+        Args: {
+          ownerId: string
+          amountValue: number
+          amountOperator: string
+          transactionName: string
+        }
+        Returns: {
+          expense: number
+          income: number
+        }[]
+      }
+        | {
+        Args: {
+          ownerId: string
+          toDate: string
+          fromDate: string
+        }
+        Returns: {
+          expense: number
+          income: number
+        }[]
+      }
+        | {
+        Args: {
+          ownerId: string
+          toDate: string
+          fromDate: string
+          amountValue: number
+          amountOperator: string
+        }
+        Returns: {
+          expense: number
+          income: number
+        }[]
+      }
+        | {
+        Args: {
+          ownerId: string
+          toDate: string
+          fromDate: string
+          amountValue: number
+          amountOperator: string
+          transactionName: string
+        }
+        Returns: {
+          expense: number
+          income: number
+        }[]
+      }
+        | {
+        Args: {
+          ownerId: string
+          toDate: string
+          fromDate: string
+          transactionName: string
+        }
+        Returns: {
+          expense: number
+          income: number
+        }[]
+      }
+        | {
+        Args: {
+          ownerId: string
+          transactionName: string
+        }
+        Returns: {
+          expense: number
+          income: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

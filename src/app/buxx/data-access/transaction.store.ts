@@ -36,7 +36,7 @@ const initialState: BuxxState = {
   query: {
     amount: {
       op: '<=',
-      value: 50000
+      value: 500
     },
     fromDate: sub(new Date(), { days: 30 }),
     toDate: new Date(),
@@ -49,7 +49,7 @@ const initialState: BuxxState = {
 };
 
 @Injectable()
-export class BuxxStore {
+export class TransactionStore {
 
   private readonly snackBar = inject(MatSnackBar);
   private readonly authStore = inject(AuthStore);

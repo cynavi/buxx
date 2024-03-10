@@ -10,9 +10,8 @@ import {
 } from '@angular/core';
 import { ToolbarComponent } from '../../shared/ui/toolbar/feature/toolbar.component';
 import { DeleteTransaction, Operator, SaveTransaction, Transaction } from '../../shared/model/buxx.model';
-import { BuxxStore } from '../data-access/buxx.store';
-import { MatCardModule } from '@angular/material/card';
-import { AsyncPipe, DatePipe, NgClass, NgForOf, NgIf } from '@angular/common';
+import { TransactionStore } from '../data-access/transaction.store';
+import { AsyncPipe, DatePipe, NgClass } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -23,7 +22,6 @@ import {
   AbstractControl,
   FormBuilder,
   FormGroup,
-  FormsModule,
   ReactiveFormsModule,
   ValidationErrors,
   ValidatorFn
@@ -37,6 +35,9 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { sub } from 'date-fns';
 import { TransactionDialogComponent } from '../../shared/ui/add-new-dialog/feature/transaction-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { SummaryComponent } from '../ui/summary/summary.component';
+import { SummaryStore } from '../data-access/summary.store';
+import { SummaryService } from '../data-access/summary.service';
 
 export const dateRangeValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const toDate = control.get('toDate');
@@ -49,11 +50,8 @@ export const dateRangeValidator: ValidatorFn = (control: AbstractControl): Valid
   standalone: true,
   imports: [
     ToolbarComponent,
-    MatCardModule,
     NgClass,
-    NgIf,
     MatButtonModule,
-    NgForOf,
     MatPaginatorModule,
     MatExpansionModule,
     AsyncPipe,
@@ -64,29 +62,30 @@ export const dateRangeValidator: ValidatorFn = (control: AbstractControl): Valid
     MatNativeDateModule,
     MatFormFieldModule,
     ReactiveFormsModule,
-    FormsModule,
-    MatSelectModule
+    MatSelectModule,
+    SummaryComponent
   ],
   templateUrl: './buxx.component.html',
   styleUrl: './buxx.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [BuxxStore]
+  providers: [TransactionStore, SummaryStore, SummaryService]
 })
 export class BuxxComponent implements OnInit, OnDestroy {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  private readonly store = inject(BuxxStore);
+  readonly summaryStore = inject(SummaryStore);
   private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
+  private readonly transactionStore = inject(TransactionStore);
 
   private dataSource: MatTableDataSource<Transaction> = new MatTableDataSource<Transaction>([]);
-  transactions$: Observable<Transaction[]> = toObservable(computed(() => this.store.data().transactions));
+  transactions$: Observable<Transaction[]> = toObservable(computed(() => this.transactionStore.data().transactions));
   filterForm!: FormGroup;
   paginatorLength!: number;
 
   constructor() {
     effect(() => {
-      const data = this.store.data();
+      const data = this.transactionStore.data();
       this.dataSource.data = data.transactions;
       this.paginatorLength = data.count;
     });
@@ -95,7 +94,7 @@ export class BuxxComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initQueryForm();
     this.dataSource.paginator = this.paginator;
-    this.store.fetch$.next({
+    this.transactionStore.fetch$.next({
       amount: {
         op: '<=',
         value: 500
@@ -108,6 +107,7 @@ export class BuxxComponent implements OnInit, OnDestroy {
         isNext: true
       }
     });
+    this.summaryStore.fetch$.next();
   }
 
   initQueryForm(): void {
@@ -127,7 +127,7 @@ export class BuxxComponent implements OnInit, OnDestroy {
   }
 
   saveTransaction(transaction: SaveTransaction): void {
-    this.store.save$.next(transaction);
+    this.transactionStore.save$.next(transaction);
   }
 
   updateTransaction(transaction: Transaction): void {
@@ -136,31 +136,31 @@ export class BuxxComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.store.update$.next(result);
+        this.transactionStore.update$.next(result);
       }
     });
   }
 
   deleteTransaction(transactionId: DeleteTransaction): void {
-    this.store.delete$.next(transactionId);
+    this.transactionStore.delete$.next(transactionId);
   }
 
   paginate(event: PageEvent): void {
     if (event.previousPageIndex! < event.pageIndex) {
-      this.store.fetch$.next({
-        ...this.store.query(),
+      this.transactionStore.fetch$.next({
+        ...this.transactionStore.query(),
         paginate: {
           pageSize: event.pageSize,
-          pointer: this.store.query().paginate.pointer,
+          pointer: this.transactionStore.query().paginate.pointer,
           isNext: true
         }
       });
     } else {
-      this.store.fetch$.next({
-        ...this.store.query(),
+      this.transactionStore.fetch$.next({
+        ...this.transactionStore.query(),
         paginate: {
           pageSize: event.pageSize,
-          pointer: this.store.query().paginate.pointer,
+          pointer: this.transactionStore.query().paginate.pointer,
           isNext: false
         }
       });

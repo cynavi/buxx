@@ -1,34 +1,6 @@
 <as-toolbar (newTransactionEmitter)="saveTransaction($event)"></as-toolbar>
 <div class="flex flex-col items-center justify-center">
-	<div class="flex flex-row sm:flex-col sm:min-w-11/12">
-		<mat-card class="w-64 h-40 mb-2 mr-2 items-center justify-center sm:min-w-full sm:mr-0">
-			<mat-card-header>
-				<mat-card-title>Rs. 874</mat-card-title>
-				<mat-card-subtitle>
-					<mat-icon class="positive scale-150 mt-2 mr-2">arrow_upward_alt</mat-icon>overall
-				</mat-card-subtitle>
-			</mat-card-header>
-		</mat-card>
-
-		<mat-card class="w-64 h-40 mb-2 mr-2 items-center justify-center sm:min-w-full sm:mr-0">
-			<mat-card-header>
-				<mat-card-title>Rs. 8745</mat-card-title>
-				<mat-card-subtitle>
-					<mat-icon class="positive scale-150 mt-2 mr-2">arrow_upward_alt</mat-icon>income
-				</mat-card-subtitle>
-			</mat-card-header>
-		</mat-card>
-
-		<mat-card class="w-64 h-40 mb-2 mr-2 items-center justify-center sm:min-w-full sm:mr-0">
-			<mat-card-header>
-					<mat-card-title>Rs. 78237</mat-card-title>
-					<mat-card-subtitle>
-						<mat-icon class="negative scale-150 mt-2 mr-2">arrow_downward_alt</mat-icon>expense
-					</mat-card-subtitle>
-			</mat-card-header>
-		</mat-card>
-	</div>
-
+	<as-summary [summary]="summaryStore.data()"></as-summary>
 	<mat-accordion class="flex flex-col w-3/4 sm:min-w-11/12 sm:mx-14">
 		<mat-expansion-panel class="w-full  sm:mx-14" [expanded]="false">
 			<mat-expansion-panel-header>
