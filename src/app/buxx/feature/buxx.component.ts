@@ -146,25 +146,14 @@ export class BuxxComponent implements OnInit, OnDestroy {
   }
 
   paginate(event: PageEvent): void {
-    if (event.previousPageIndex! < event.pageIndex) {
-      this.transactionStore.fetch$.next({
-        ...this.transactionStore.query(),
-        paginate: {
-          pageSize: event.pageSize,
-          pointer: this.transactionStore.query().paginate.pointer,
-          isNext: true
-        }
-      });
-    } else {
-      this.transactionStore.fetch$.next({
-        ...this.transactionStore.query(),
-        paginate: {
-          pageSize: event.pageSize,
-          pointer: this.transactionStore.query().paginate.pointer,
-          isNext: false
-        }
-      });
-    }
+    this.transactionStore.fetch$.next({
+      ...this.transactionStore.query(),
+      paginate: {
+        pageSize: event.pageSize,
+        pointer: this.transactionStore.query().paginate.pointer,
+        isNext: event.previousPageIndex! < event.pageIndex
+      }
+    });
   }
 
   ngOnDestroy() {
