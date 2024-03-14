@@ -11,7 +11,6 @@ import { from, Subject, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { supabase } from '../../../supabase/supabase';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { sub } from 'date-fns';
 import { AuthStore } from '../../shared/data-access/auth/auth.store';
 import { PostgrestSingleResponse } from '@supabase/supabase-js';
 import { buildFilter } from '../../shared/util/filter-builder';
@@ -23,7 +22,6 @@ type BuxxState = {
     count: number;
   },
   error: string | null;
-  query: Query;
 }
 
 const initialState: BuxxState = {
@@ -32,20 +30,7 @@ const initialState: BuxxState = {
     transactions: [],
     count: 0
   },
-  error: null,
-  query: {
-    amount: {
-      op: '<=',
-      value: 500
-    },
-    fromDate: sub(new Date(), { days: 30 }),
-    toDate: new Date(),
-    paginate: {
-      pageSize: 5,
-      pointer: 0,
-      isNext: true
-    }
-  }
+  error: null
 };
 
 @Injectable()
@@ -57,7 +42,6 @@ export class TransactionStore {
 
   loaded: Signal<boolean> = computed(() => this.state().loaded);
   data: Signal<{ transactions: Transaction[]; count: number; }> = computed(() => this.state().data);
-  query: Signal<Query> = computed(() => this.state().query);
   error: Signal<string | null> = computed(() => this.state().error);
 
   fetch$: Subject<Query> = new Subject<Query>();
@@ -75,7 +59,10 @@ export class TransactionStore {
   private handleFetch(): void {
     this.fetch$.pipe(
       takeUntilDestroyed(),
-      switchMap((query: Query) => from(buildFilter(query, this.authStore.session()?.user.id!)))
+      switchMap((query) => {
+        this.state.update(state => ({ ...state, loaded: false }));
+        return from(buildFilter(query, this.authStore.session()?.user.id!));
+      })
     ).subscribe((response: PostgrestSingleResponse<Transaction[]>) => {
       const transactions: Transaction[] = response?.data ?? [];
       this.state.update(state => ({
@@ -83,15 +70,6 @@ export class TransactionStore {
         data: {
           transactions,
           count: response.count ?? 0
-        },
-        query: {
-          ...state.query,
-          paginate: {
-            ...state.query.paginate,
-            pointer: state.query.paginate.isNext
-              ? state.query.paginate.pointer + state.query.paginate.pageSize
-              : state.query.paginate.pointer - state.query.paginate.pageSize
-          }
         }
       }));
     });

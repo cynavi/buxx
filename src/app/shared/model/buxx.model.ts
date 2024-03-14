@@ -11,11 +11,8 @@ export type DeleteTransaction = Transaction['id'];
 export type BuxxFilterBuilder = PostgrestFilterBuilder<BuxxSchema, BuxxRow, Transaction[], unknown>;
 
 export type Query = {
-  toDate?: Date;
-  fromDate?: Date;
-  amount?: Amount;
-  name?: string;
-  paginate: Paginate;
+  criteria?: Criteria;
+  paginate?: Paginate;
 };
 
 export type Amount = {
@@ -23,10 +20,21 @@ export type Amount = {
   value: number;
 };
 
+export type Criteria =  {
+  date?: {
+    start: Date;
+    end: Date;
+  }
+  amount?: Amount;
+  name?: string;
+};
+
 export type Paginate = {
-  pageSize: number;
+  range: {
+    start: number;
+    end: number;
+  };
   pointer: number;
-  isNext: boolean;
 };
 
 export type Operator = '<' | '<=' | '==' | '!=' | '>' | '>=';

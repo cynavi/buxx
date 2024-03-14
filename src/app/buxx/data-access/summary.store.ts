@@ -1,10 +1,9 @@
 import { computed, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 import { Subject, switchMap } from 'rxjs';
-import { Summary } from '../../shared/model/buxx.model';
+import { Query, Summary } from '../../shared/model/buxx.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SummaryService } from './summary.service';
 import { PostgrestSingleResponse } from '@supabase/supabase-js';
-import { TransactionStore } from './transaction.store';
 
 export type BuxxSummaryState = {
   loaded: boolean;
@@ -15,9 +14,8 @@ export type BuxxSummaryState = {
 @Injectable()
 export class SummaryStore {
 
-  fetch$: Subject<void> = new Subject<void>();
   private readonly summaryService = inject(SummaryService);
-  private readonly transactionStore = inject(TransactionStore);
+
   private state: WritableSignal<BuxxSummaryState> = signal({
     loaded: true,
     error: null,
@@ -27,16 +25,23 @@ export class SummaryStore {
       expense: 0
     }
   });
+
   readonly loaded: Signal<boolean> = computed(() => this.state().loaded);
   readonly error: Signal<string | null> = computed(() => this.state().error);
-  data: Signal<Summary> = computed(() => this.state().data);
+  readonly data: Signal<Summary> = computed(() => this.state().data);
+
+  fetch$: Subject<Query> = new Subject<Query>();
 
   constructor() {
+    this.handleFetch();
+  }
+
+  private handleFetch(): void {
     this.fetch$.pipe(
       takeUntilDestroyed(),
-      switchMap(() => {
+      switchMap((query) => {
         this.state.update(state => ({ ...state, loaded: false }));
-        return this.summaryService.getSummary(this.transactionStore.query());
+        return this.summaryService.getSummary(query);
       })
     ).subscribe((response: PostgrestSingleResponse<{ expense: number, income: number }[]>) => {
       if (response.data) {

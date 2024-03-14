@@ -9,7 +9,14 @@ import {
   ViewChild
 } from '@angular/core';
 import { ToolbarComponent } from '../../shared/ui/toolbar/feature/toolbar.component';
-import { DeleteTransaction, Operator, SaveTransaction, Transaction } from '../../shared/model/buxx.model';
+import {
+  Amount,
+  DeleteTransaction,
+  Operator,
+  Query,
+  SaveTransaction,
+  Transaction
+} from '../../shared/model/buxx.model';
 import { TransactionStore } from '../data-access/transaction.store';
 import { AsyncPipe, DatePipe, NgClass } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -32,12 +39,13 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { sub } from 'date-fns';
 import { TransactionDialogComponent } from '../../shared/ui/add-new-dialog/feature/transaction-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SummaryComponent } from '../ui/summary/summary.component';
 import { SummaryStore } from '../data-access/summary.store';
 import { SummaryService } from '../data-access/summary.service';
+import { queryInitialState, QueryStore } from '../data-access/query.store';
+import { environment } from '../../../environments/environment';
 
 export const dateRangeValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const toDate = control.get('toDate');
@@ -68,7 +76,7 @@ export const dateRangeValidator: ValidatorFn = (control: AbstractControl): Valid
   templateUrl: './buxx.component.html',
   styleUrl: './buxx.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [TransactionStore, SummaryStore, SummaryService]
+  providers: [TransactionStore, SummaryStore, SummaryService, QueryStore]
 })
 export class BuxxComponent implements OnInit, OnDestroy {
 
@@ -77,6 +85,7 @@ export class BuxxComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
   private readonly transactionStore = inject(TransactionStore);
+  private readonly queryStore = inject(QueryStore);
 
   private dataSource: MatTableDataSource<Transaction> = new MatTableDataSource<Transaction>([]);
   transactions$: Observable<Transaction[]> = toObservable(computed(() => this.transactionStore.data().transactions));
@@ -91,29 +100,28 @@ export class BuxxComponent implements OnInit, OnDestroy {
     });
   }
 
+  get startDate(): AbstractControl {
+    return this.filterForm.controls['date'].get('start')!;
+  }
+
+  get endDate(): AbstractControl {
+    return this.filterForm.controls['date'].get('end')!;
+  }
+
   ngOnInit(): void {
     this.initQueryForm();
     this.dataSource.paginator = this.paginator;
-    this.transactionStore.fetch$.next({
-      amount: {
-        op: '<=',
-        value: 500
-      },
-      fromDate: sub(new Date(), { days: 30 }),
-      toDate: new Date(),
-      paginate: {
-        pageSize: 5,
-        pointer: 0,
-        isNext: true
-      }
-    });
-    this.summaryStore.fetch$.next();
+    this.queryStore.query$.next(queryInitialState.query);
+    this.summaryStore.fetch$.next(queryInitialState.query);
+    this.transactionStore.fetch$.next(queryInitialState.query);
   }
 
   initQueryForm(): void {
     this.filterForm = this.fb.group({
-      toDate: this.fb.control<Date | null>(null),
-      fromDate: this.fb.control<Date | null>(null),
+      date: this.fb.group({
+        start: this.fb.control<Date | null>(null),
+        end: this.fb.control<Date | null>(null)
+      }),
       amount: this.fb.group({
         operator: this.fb.control<Operator>('<'),
         value: this.fb.control<number | null>(null)
@@ -123,7 +131,21 @@ export class BuxxComponent implements OnInit, OnDestroy {
   }
 
   applyFilter(): void {
-
+    let amount: Amount | undefined;
+    if (this.filterForm.value.amount.value) {
+      amount = {
+        value: this.filterForm.value.amount.value,
+        op: this.filterForm.value.amount.operator
+      }
+    }
+    this.queryStore.query$.next({
+      criteria: {
+        amount,
+        date: this.filterForm.value.date,
+        name: this.filterForm.value.name
+      },
+      paginate: queryInitialState.query.paginate
+    });
   }
 
   saveTransaction(transaction: SaveTransaction): void {
@@ -146,12 +168,22 @@ export class BuxxComponent implements OnInit, OnDestroy {
   }
 
   paginate(event: PageEvent): void {
-    this.transactionStore.fetch$.next({
-      ...this.transactionStore.query(),
+    const query: Query | null = this.queryStore.query();
+    let start: number, end: number;
+    const pointer = query?.paginate?.pointer ?? 0;
+    if (event.previousPageIndex! < event.pageIndex) {
+      start = pointer;
+      end = pointer + event.pageSize - 1;
+    } else {
+      start = pointer - 2 * event.pageSize;
+      end = pointer - event.pageSize - 1;
+    }
+    this.queryStore.query$.next({
       paginate: {
-        pageSize: event.pageSize,
-        pointer: this.transactionStore.query().paginate.pointer,
-        isNext: event.previousPageIndex! < event.pageIndex
+        pointer: event.previousPageIndex! < event.pageIndex
+          ? pointer + environment.pageSize
+          : pointer - environment.pageSize,
+        range: { start, end }
       }
     });
   }
