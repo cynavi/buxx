@@ -154,7 +154,8 @@ export class BuxxComponent implements OnInit, OnDestroy {
 
   updateTransaction(transaction: Transaction): void {
     const dialogRef = this.dialog.open(TransactionDialogComponent, {
-      data: transaction
+      data: transaction,
+      panelClass: ['w-3/6']
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {

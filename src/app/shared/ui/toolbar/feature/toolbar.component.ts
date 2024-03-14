@@ -25,7 +25,9 @@ export class ToolbarComponent {
   @Output() newTransactionEmitter = new EventEmitter<SaveTransaction>();
 
   openAddDialog(): void {
-    const dialogRef = this.dialog.open(TransactionDialogComponent);
+    const dialogRef = this.dialog.open(TransactionDialogComponent, {
+      panelClass: ['w-3/6']
+    });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.newTransactionEmitter.emit({
