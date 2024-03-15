@@ -49,10 +49,14 @@ import { environment } from '../../../environments/environment';
 import { PositiveNumberOnlyDirective } from '../../shared/util/positive-number.directive';
 import { MaskDateDirective } from '../../shared/util/date-mask.directive';
 
-export const dateRangeValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-  const toDate = control.get('toDate');
-  const fromDate = control.get('fromDate');
-  return toDate && fromDate;
+export const filterValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const date = control.get('date');
+  const amount = control.get('amount');
+  const isDateRangeValid = !!date?.get('start')?.value && !!date?.get('end')?.value;
+  const isAmountValid = !!amount?.get('operator')?.value && !!amount?.get('value')?.value;
+  return (isDateRangeValid || isAmountValid || !!control.get('name')?.value)
+    ? null
+    : { invalidCombination: true };
 };
 
 @Component({
@@ -131,7 +135,7 @@ export class BuxxComponent implements OnInit, OnDestroy {
         value: this.fb.control<number | null>(null)
       }),
       name: this.fb.control<string | null>(null)
-    }, { validators: [dateRangeValidator] });
+    }, { validators: filterValidator });
   }
 
   applyFilter(): void {

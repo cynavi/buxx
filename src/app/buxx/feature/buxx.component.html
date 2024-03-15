@@ -52,7 +52,7 @@
 					</mat-form-field>
 				</div>
 			</div>
-			<button mat-button color="accent" (click)="applyFilter()">Apply</button>
+			<button (click)="applyFilter()" [disabled]="!filterForm.valid" color="accent" mat-button>Apply</button>
 		</mat-expansion-panel>
 
 		@for (transaction of transactions$ | async; track transaction.id) {
