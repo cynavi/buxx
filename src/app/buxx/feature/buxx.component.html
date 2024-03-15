@@ -14,8 +14,8 @@
 					<mat-form-field>
 						<mat-label>Date Between</mat-label>
 						<mat-date-range-input [rangePicker]="picker">
-							<input formControlName="start" matStartDate placeholder="Start date">
-							<input formControlName="end" matEndDate placeholder="End date">
+							<input dateMask formControlName="start" matStartDate placeholder="Start date" />
+							<input dateMask formControlName="end" matEndDate placeholder="End date" />
 						</mat-date-range-input>
 						<mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
 						<mat-date-range-picker #picker></mat-date-range-picker>
@@ -42,7 +42,7 @@
 					</mat-form-field>
 					<mat-form-field>
 						<mat-label>Value</mat-label>
-						<input matInput formControlName="value">
+						<input formControlName="value" matInput positiveNumberOnly>
 					</mat-form-field>
 				</div>
 				<div>

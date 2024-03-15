@@ -8,6 +8,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { Transaction } from '../../../model/buxx.model';
+import { PositiveNumberOnlyDirective } from '../../../util/positive-number.directive';
+import { MaskDateDirective } from '../../../util/date-mask.directive';
 
 @Component({
   selector: 'as-add-new-dialog',
@@ -22,7 +24,9 @@ import { Transaction } from '../../../model/buxx.model';
     ReactiveFormsModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatSelectModule
+    MatSelectModule,
+    PositiveNumberOnlyDirective,
+    MaskDateDirective
   ],
   providers: [provideNativeDateAdapter()]
 })

@@ -46,6 +46,8 @@ import { SummaryStore } from '../data-access/summary.store';
 import { SummaryService } from '../data-access/summary.service';
 import { queryInitialState, QueryStore } from '../data-access/query.store';
 import { environment } from '../../../environments/environment';
+import { PositiveNumberOnlyDirective } from '../../shared/util/positive-number.directive';
+import { MaskDateDirective } from '../../shared/util/date-mask.directive';
 
 export const dateRangeValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const toDate = control.get('toDate');
@@ -71,7 +73,9 @@ export const dateRangeValidator: ValidatorFn = (control: AbstractControl): Valid
     MatFormFieldModule,
     ReactiveFormsModule,
     MatSelectModule,
-    SummaryComponent
+    SummaryComponent,
+    PositiveNumberOnlyDirective,
+    MaskDateDirective
   ],
   templateUrl: './buxx.component.html',
   styleUrl: './buxx.component.scss',
@@ -136,7 +140,7 @@ export class BuxxComponent implements OnInit, OnDestroy {
       amount = {
         value: this.filterForm.value.amount.value,
         op: this.filterForm.value.amount.operator
-      }
+      };
     }
     this.queryStore.query$.next({
       criteria: {
