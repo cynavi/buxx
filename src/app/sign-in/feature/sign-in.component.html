@@ -8,7 +8,7 @@
 				<mat-error>Please enter a valid email address</mat-error>
 			}
 			@if (email.hasError('required')) {
-				<mat-error>Email is <strong>required</strong></mat-error>
+				<mat-error>Email is required</mat-error>
 			}
 		</mat-form-field>
 
@@ -26,5 +26,7 @@
 		        (click)="signIn()"
 		        [disabled]="!signInForm.valid">{{ signInStore.loaded() ? 'Sign In' : 'Signing In...' }}
 		</button>
+		<div class="cream text-lg mt-4 m-2 flex items-center justify-center">Not a user yet?</div>
+		<button (click)="signUp()" color="primary" mat-stroked-button>Sign Up</button>
 	</div>
 </div>

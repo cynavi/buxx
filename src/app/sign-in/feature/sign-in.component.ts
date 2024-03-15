@@ -1,22 +1,15 @@
 import { Component, inject } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { FormControl, FormGroup, FormGroupDirective, NgForm, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { ErrorStateMatcher } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { SignInStore } from '../data-access/sign-in.store';
-
-/** Error when invalid control is dirty, touched, or submitted. */
-export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
-  }
-}
+import { CustomErrorStateMatcher } from '../../shared/util/custom-error-state-matcher';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'buxx-sign-in',
+  selector: 'as-sign-in',
   standalone: true,
   imports: [
     MatFormFieldModule,
@@ -27,17 +20,17 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   ],
   providers: [SignInStore],
   templateUrl: './sign-in.component.html',
-  styleUrl: './sign-in.component.scss',
+  styleUrl: './sign-in.component.scss'
 })
 export class SignInComponent {
 
+  matcher = new CustomErrorStateMatcher();
   readonly signInStore = inject(SignInStore);
   signInForm: FormGroup = new FormGroup<any>({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required])
   });
-
-  matcher = new MyErrorStateMatcher();
+  private readonly router = inject(Router);
   hide = true;
 
   get email(): FormControl {
@@ -53,5 +46,9 @@ export class SignInComponent {
       email: this.email.value,
       password: this.password.value
     });
+  }
+
+  signUp(): void {
+    this.router.navigate(['sign-in']);
   }
 }

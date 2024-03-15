@@ -3,7 +3,6 @@ import { provideRouter, Route } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { authGuard } from './shared/util/guards';
-import { AuthStore } from './shared/data-access/auth/auth.store';
 
 const routes: Route[] = [
   {

@@ -26,12 +26,11 @@ export class SignUpStore {
     this.signUp$.pipe(
       takeUntilDestroyed(),
       switchMap((credentials: SignUpWithPasswordCredentials) => {
-        this.state.set({loaded: false, error: null});
+        this.state.set({ loaded: false, error: null });
         return supabase.auth.signUp(credentials);
       })
     ).subscribe((response: AuthResponse): void => {
       if (response.data.user) {
-        // ToastUtil.open('Sign Up successful. Confirm your email to continue.', this.toastController).then();
         this.state.set({ loaded: true, error: null });
         this.router.navigate(['sign-in']).then();
       }
