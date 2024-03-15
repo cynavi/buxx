@@ -13,12 +13,12 @@
 				<div formGroupName="date">
 					<mat-form-field>
 						<mat-label>Date Between</mat-label>
-						<mat-date-range-input [rangePicker]="picker">
-							<input dateMask formControlName="start" matStartDate placeholder="Start date" />
-							<input dateMask formControlName="end" matEndDate placeholder="End date" />
+						<mat-date-range-input [disabled]="true" [rangePicker]="picker">
+							<input formControlName="start" matStartDate placeholder="Start date" />
+							<input formControlName="end" matEndDate placeholder="End date" />
 						</mat-date-range-input>
 						<mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-						<mat-date-range-picker #picker></mat-date-range-picker>
+						<mat-date-range-picker #picker [disabled]="false"></mat-date-range-picker>
 
 						@if (startDate.hasError('matStartDateInvalid')) {
 							<mat-error>Invalid start date</mat-error>
