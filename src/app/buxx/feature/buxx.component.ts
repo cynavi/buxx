@@ -48,6 +48,7 @@ import { queryInitialState, QueryStore } from '../data-access/query.store';
 import { environment } from '../../../environments/environment';
 import { PositiveNumberOnlyDirective } from '../../shared/util/positive-number.directive';
 import { MaskDateDirective } from '../../shared/util/date-mask.directive';
+import { RecentTransactionComponent } from '../ui/recent-transaction/recent-transaction.component';
 
 export const filterValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const date = control.get('date');
@@ -79,7 +80,8 @@ export const filterValidator: ValidatorFn = (control: AbstractControl): Validati
     MatSelectModule,
     SummaryComponent,
     PositiveNumberOnlyDirective,
-    MaskDateDirective
+    MaskDateDirective,
+    RecentTransactionComponent
   ],
   templateUrl: './buxx.component.html',
   styleUrl: './buxx.component.scss',

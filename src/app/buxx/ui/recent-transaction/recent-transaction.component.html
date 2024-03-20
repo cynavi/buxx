@@ -1,0 +1,46 @@
+@if (transactions.length) {
+	<mat-accordion class="flex flex-col w-full mb-4 sm:min-w-11/12 sm:mx-14">
+		<mat-expansion-panel [hideToggle]="true">
+			<mat-expansion-panel-header>
+				<mat-panel-title class="text-lg">
+					<mat-icon class="mr-2">layers</mat-icon>
+					Recent Activity
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+		</mat-expansion-panel>
+
+		@for (transaction of transactions; track transaction.id) {
+			<mat-expansion-panel class="w-full">
+				<mat-expansion-panel-header>
+					<mat-panel-title>
+						<span class="mr-4 font-bold">
+							@if (transaction.isExpense) {
+								<mat-icon class="negative">trending_down</mat-icon>
+							} @else {
+								<mat-icon class="positive">trending_up</mat-icon>
+							}
+						</span>
+						{{ transaction.name }}
+						<span class="ml-2">
+						@if (transaction.action === 'DELETED') {
+							<mat-chip style="background: #6f1a07">deleted</mat-chip>
+						} @else if (transaction.action === 'SAVED') {
+							<mat-chip style="background: #607d8b">saved</mat-chip>
+						}
+					</span>
+					</mat-panel-title>
+					<mat-panel-description>Rs. {{ transaction.amount }}</mat-panel-description>
+					<mat-panel-description>{{ transaction.date | date: 'mediumDate' }}</mat-panel-description>
+				</mat-expansion-panel-header>
+				<div class="flex flex-row float-right sm:flex-col sm:float-none">
+					@if (transaction.action === 'DELETED') {
+						<button mat-raised-button color="accent" class="sm:mb-2" (click)="restore(transaction)">Restore</button>
+					} @else if (transaction.action === 'SAVED') {
+						<button mat-raised-button color="warn" class="sm:mb-2" (click)="delete(transaction)">Delete</button>
+					}
+				</div>
+				<p>{{ transaction.details }}</p>
+			</mat-expansion-panel>
+		}
+	</mat-accordion>
+}
