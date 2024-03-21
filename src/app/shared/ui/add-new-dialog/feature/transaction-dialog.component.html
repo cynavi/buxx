@@ -33,8 +33,8 @@
 	</div>
 </mat-dialog-content>
 <mat-dialog-actions>
-	<button mat-button (click)="closDialog(false)">Cancel</button>
-	<button mat-button (click)="closDialog(true)" [disabled]="!transactionForm.valid">
+	<button (click)="closeDialog(true)" mat-button>Cancel</button>
+	<button (click)="closeDialog(false)" [disabled]="!transactionForm.valid" mat-button>
 		{{ data ? 'Update' : 'Save' }}
 	</button>
 </mat-dialog-actions>

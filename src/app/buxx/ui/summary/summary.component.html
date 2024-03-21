@@ -1,7 +1,7 @@
 <div class="flex flex-row sm:flex-col sm:min-w-11/12">
 	<mat-card class="w-64 h-40 mb-2 mr-2 items-center justify-center sm:min-w-full sm:mr-0">
 		<mat-card-header>
-			<mat-card-title>Rs. {{summary().balance}}</mat-card-title>
+			<mat-card-title>{{summary().balance | nprCurrency }}</mat-card-title>
 			<mat-card-subtitle>
 				<mat-icon class="positive scale-150 mt-2 mr-2">arrow_upward_alt</mat-icon>balance
 			</mat-card-subtitle>
@@ -10,7 +10,7 @@
 
 	<mat-card class="w-64 h-40 mb-2 mr-2 items-center justify-center sm:min-w-full sm:mr-0">
 		<mat-card-header>
-			<mat-card-title>Rs. {{summary().income}}</mat-card-title>
+			<mat-card-title>{{summary().income | nprCurrency}}</mat-card-title>
 			<mat-card-subtitle>
 				<mat-icon class="positive scale-150 mt-2 mr-2">arrow_upward_alt</mat-icon>income
 			</mat-card-subtitle>
@@ -19,7 +19,7 @@
 
 	<mat-card class="w-64 h-40 mb-2 mr-2 items-center justify-center sm:min-w-full sm:mr-0">
 		<mat-card-header>
-			<mat-card-title>Rs. {{summary().expense}}</mat-card-title>
+			<mat-card-title>{{summary().expense | nprCurrency}}</mat-card-title>
 			<mat-card-subtitle>
 				<mat-icon class="negative scale-150 mt-2 mr-2">arrow_downward_alt</mat-icon>expense
 			</mat-card-subtitle>

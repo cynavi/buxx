@@ -48,7 +48,8 @@ import { queryInitialState, QueryStore } from '../data-access/query.store';
 import { environment } from '../../../environments/environment';
 import { PositiveNumberOnlyDirective } from '../../shared/util/positive-number.directive';
 import { MaskDateDirective } from '../../shared/util/date-mask.directive';
-import { RecentTransactionComponent } from '../ui/recent-transaction/recent-transaction.component';
+import { RecentActivityComponent } from '../ui/recent-activity/recent-activity.component';
+import { RecentActivityStore } from '../data-access/recent-activity.store';
 
 export const filterValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const date = control.get('date');
@@ -81,17 +82,18 @@ export const filterValidator: ValidatorFn = (control: AbstractControl): Validati
     SummaryComponent,
     PositiveNumberOnlyDirective,
     MaskDateDirective,
-    RecentTransactionComponent
+    RecentActivityComponent
   ],
   templateUrl: './buxx.component.html',
   styleUrl: './buxx.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [TransactionStore, SummaryStore, SummaryService, QueryStore]
+  providers: [TransactionStore, SummaryStore, SummaryService, QueryStore, RecentActivityStore]
 })
 export class BuxxComponent implements OnInit, OnDestroy {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   readonly summaryStore = inject(SummaryStore);
+  readonly recentActivityStore = inject(RecentActivityStore);
   private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
   private readonly transactionStore = inject(TransactionStore);

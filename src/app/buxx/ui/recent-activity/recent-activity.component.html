@@ -1,4 +1,4 @@
-@if (transactions.length) {
+@if (transactions().length) {
 	<mat-accordion class="flex flex-col w-full mb-4 sm:min-w-11/12 sm:mx-14">
 		<mat-expansion-panel [hideToggle]="true">
 			<mat-expansion-panel-header>
@@ -9,7 +9,7 @@
 			</mat-expansion-panel-header>
 		</mat-expansion-panel>
 
-		@for (transaction of transactions; track transaction.id) {
+		@for (transaction of transactions(); track transaction.id) {
 			<mat-expansion-panel class="w-full">
 				<mat-expansion-panel-header>
 					<mat-panel-title>
@@ -32,13 +32,6 @@
 					<mat-panel-description>Rs. {{ transaction.amount }}</mat-panel-description>
 					<mat-panel-description>{{ transaction.date | date: 'mediumDate' }}</mat-panel-description>
 				</mat-expansion-panel-header>
-				<div class="flex flex-row float-right sm:flex-col sm:float-none">
-					@if (transaction.action === 'DELETED') {
-						<button mat-raised-button color="accent" class="sm:mb-2" (click)="restore(transaction)">Restore</button>
-					} @else if (transaction.action === 'SAVED') {
-						<button mat-raised-button color="warn" class="sm:mb-2" (click)="delete(transaction)">Delete</button>
-					}
-				</div>
 				<p>{{ transaction.details }}</p>
 			</mat-expansion-panel>
 		}
