@@ -52,6 +52,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { RecentActivityComponent } from '../ui/recent-activity/recent-activity.component';
 import { RecentActivityStore } from '../data-access/recent-activity.store';
+import { NprCurrencyPipe } from '../../shared/util/npr-currency.pipe';
 
 export const filterValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const date = control.get('date');
@@ -86,7 +87,8 @@ export const filterValidator: ValidatorFn = (control: AbstractControl): Validati
     MaskDateDirective,
     MatProgressSpinner,
     MatProgressBar,
-    RecentActivityComponent
+    RecentActivityComponent,
+    NprCurrencyPipe
   ],
   templateUrl: './buxx.component.html',
   styleUrl: './buxx.component.scss',

@@ -72,7 +72,7 @@
 						</span>
 							{{ transaction.name }}
 						</mat-panel-title>
-						<mat-panel-description>Rs. {{ transaction.amount }}</mat-panel-description>
+						<mat-panel-description>{{ transaction.amount | nprCurrency }}</mat-panel-description>
 						<mat-panel-description>
 							{{ transaction.date | date: 'mediumDate' }}
 						</mat-panel-description>
