@@ -1,6 +1,6 @@
 <as-toolbar (newTransactionEmitter)="saveTransaction($event)"></as-toolbar>
 <div class="flex flex-col items-center justify-center">
-	<as-summary [summary]="summaryStore.data()"></as-summary>
+	<as-summary [loaded]="summaryStore.loaded()" [summary]="summaryStore.data()"></as-summary>
 	<mat-accordion class="flex flex-col w-3/4 sm:min-w-11/12 sm:mx-14">
 		<mat-expansion-panel class="w-full  sm:mx-14" [expanded]="false">
 			<mat-expansion-panel-header>
@@ -55,10 +55,11 @@
 			<button (click)="applyFilter()" [disabled]="!filterForm.valid" color="accent" mat-button>Apply</button>
 		</mat-expansion-panel>
 
-		@for (transaction of transactions$ | async; track transaction.id) {
-			<mat-expansion-panel class="w-full">
-				<mat-expansion-panel-header>
-					<mat-panel-title>
+		@if (transactionStore.loaded()) {
+			@for (transaction of transactions$ | async; track transaction.id) {
+				<mat-expansion-panel class="w-full">
+					<mat-expansion-panel-header>
+						<mat-panel-title>
 						<span class="mr-4 font-bold">
 							@if (transaction.isExpense) {
 								<mat-icon class="negative">trending_down</mat-icon>
@@ -66,19 +67,22 @@
 								<mat-icon class="positive">trending_up</mat-icon>
 							}
 						</span>
-						{{ transaction.name }}
-					</mat-panel-title>
-					<mat-panel-description>Rs. {{ transaction.amount }}</mat-panel-description>
-					<mat-panel-description>
-						{{ transaction.date | date: 'mediumDate' }}
-					</mat-panel-description>
-				</mat-expansion-panel-header>
-				<div class="flex flex-row float-right sm:flex-col sm:float-none">
-					<button mat-button color="accent" class="sm:mb-2" (click)="updateTransaction(transaction)">Update</button>
-					<button mat-button color="warn" (click)="deleteTransaction(transaction.id)">Delete</button>
-				</div>
-				<p>{{ transaction.details }}</p>
-			</mat-expansion-panel>
+							{{ transaction.name }}
+						</mat-panel-title>
+						<mat-panel-description>Rs. {{ transaction.amount }}</mat-panel-description>
+						<mat-panel-description>
+							{{ transaction.date | date: 'mediumDate' }}
+						</mat-panel-description>
+					</mat-expansion-panel-header>
+					<div class="flex flex-row float-right sm:flex-col sm:float-none">
+						<button mat-button color="accent" class="sm:mb-2" (click)="updateTransaction(transaction)">Update</button>
+						<button mat-button color="warn" (click)="deleteTransaction(transaction.id)">Delete</button>
+					</div>
+					<p>{{ transaction.details }}</p>
+				</mat-expansion-panel>
+			}
+		} @else {
+			<mat-progress-bar mode="indeterminate"></mat-progress-bar>
 		}
 
 		<mat-paginator aria-label="Select page"

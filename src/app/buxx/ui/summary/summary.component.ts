@@ -13,4 +13,5 @@ import { Summary } from '../../../shared/model/buxx.model';
 export class SummaryComponent {
 
   summary = input.required<Summary>();
+  loaded = input.required<boolean>();
 }

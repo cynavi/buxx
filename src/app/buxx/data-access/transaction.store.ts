@@ -70,7 +70,8 @@ export class TransactionStore {
         data: {
           transactions,
           count: response.count ?? 0
-        }
+        },
+        loaded: true
       }));
     });
   }
