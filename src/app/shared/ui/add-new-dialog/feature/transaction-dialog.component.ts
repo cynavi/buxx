@@ -59,11 +59,11 @@ export class TransactionDialogComponent implements OnInit {
     this.transactionForm.patchValue({ name, amount, date, isExpense, details });
   }
 
-  closDialog(isSave: boolean): void {
-    if (isSave) {
-      this.dialogRef.close(this.transactionForm.value);
-    } else {
+  closeDialog(isCancel: boolean): void {
+    if (isCancel) {
       this.dialogRef.close();
+    } else {
+      this.dialogRef.close(this.data ? { ...this.transactionForm.value, id: this.data.id } : this.transactionForm.value);
     }
   }
 }

@@ -44,3 +44,5 @@ export type Summary = {
   income: number,
   expense: number
 };
+
+export type RecentTransaction = Transaction & { action: 'DELETED' | 'SAVED' };

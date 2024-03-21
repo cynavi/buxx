@@ -3,6 +3,7 @@ import { provideRouter, Route } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { authGuard } from './shared/util/guards';
+import { CurrencyPipe } from '@angular/common';
 
 const routes: Route[] = [
   {
@@ -18,6 +19,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     importProvidersFrom(BrowserAnimationsModule),
+    CurrencyPipe,
     provideAnimationsAsync()
   ]
 };

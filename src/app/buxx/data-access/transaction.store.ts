@@ -7,13 +7,14 @@ import {
   TRANSACTIONS,
   UpdateTransaction
 } from '../../shared/model/buxx.model';
-import { from, Subject, switchMap } from 'rxjs';
+import { from, map, Subject, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { supabase } from '../../../supabase/supabase';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthStore } from '../../shared/data-access/auth/auth.store';
 import { PostgrestSingleResponse } from '@supabase/supabase-js';
 import { buildFilter } from '../../shared/util/filter-builder';
+import { RecentActivityStore } from './recent-activity.store';
 
 type BuxxState = {
   loaded: boolean;
@@ -38,6 +39,7 @@ export class TransactionStore {
 
   private readonly snackBar = inject(MatSnackBar);
   private readonly authStore = inject(AuthStore);
+  private readonly recentActivityStore = inject(RecentActivityStore);
   private state: WritableSignal<BuxxState> = signal(initialState);
 
   loaded: Signal<boolean> = computed(() => this.state().loaded);
@@ -79,15 +81,17 @@ export class TransactionStore {
   private handleSave(): void {
     this.save$.pipe(
       takeUntilDestroyed(),
-      switchMap((transaction: SaveTransaction) => from(supabase.from(TRANSACTIONS).insert(transaction)))
-    ).subscribe({
-      next: () => {
-        this.snackBar.open('Transaction has been saved.', undefined, { duration: 3000 });
-      },
-      error: err => {
-        this.state.update(state => ({ ...state, error: err }));
+      switchMap((transaction: SaveTransaction) => from(supabase.from(TRANSACTIONS).insert(transaction).select()))
+    ).subscribe(response => {
+        if (response.error) {
+          this.openSnackBar('Unable to save transaction.');
+          this.state.update(state => ({ ...state, error: response.error.message }));
+        } else {
+          this.openSnackBar('Transaction has been saved.');
+          this.recentActivityStore.add$.next({ ...response.data[0], action: 'SAVED' });
+        }
       }
-    });
+    );
   }
 
   private handleUpdate() {
@@ -97,28 +101,51 @@ export class TransactionStore {
         .from(TRANSACTIONS)
         .update(transaction)
         .eq('id', transaction.id)
-      ))
-    ).subscribe({
-      next: () => {
-        this.snackBar.open('Transaction has been updated.', undefined, { duration: 3000 });
-      },
-      error: err => {
-        this.state.update(state => ({ ...state, error: err }));
+      ).pipe(map(response => ({ response, transaction: transaction }))))
+    ).subscribe(({ response, transaction }) => {
+        if (response.error) {
+          this.openSnackBar('Unable to update transaction.');
+          this.state.update(state => ({ ...state, error: response.error.message }));
+        } else {
+          this.snackBar.open('Transaction has been updated.');
+          this.state.update(state => ({
+            ...state,
+            data: {
+              ...state.data,
+              transactions: state.data.transactions.map(t => t.id === transaction.id ? transaction : t)
+            }
+          }));
+        }
       }
-    });
+    );
   }
 
   private handleDelete() {
     this.delete$.pipe(
       takeUntilDestroyed(),
-      switchMap((id: DeleteTransaction) => from(supabase.from(TRANSACTIONS).delete().eq('id', id)))
-    ).subscribe({
-      next: () => {
-        this.snackBar.open('Transaction has been deleted.', undefined, { duration: 3000 });
-      },
-      error: err => {
-        this.state.update(state => ({ ...state, error: err }));
+      switchMap((id: DeleteTransaction) => from(supabase.from(TRANSACTIONS).delete().eq('id', id))
+        .pipe(map(response => ({ response, id })))
+      )).subscribe(({ response, id }) => {
+        if (response.error) {
+          this.openSnackBar('Unable to delete transaction.');
+          this.state.update(state => ({ ...state, error: response.error.message }));
+        } else {
+          this.openSnackBar('Transaction has been deleted.');
+          const transaction: Transaction = this.data().transactions.find(t => t.id === id)!;
+          this.recentActivityStore.add$.next({ ...transaction, action: 'DELETED' });
+          this.state.update(state => ({
+            ...state,
+            data: {
+              ...state.data,
+              transactions: state.data.transactions.filter(t => t.id != id)
+            }
+          }));
+        }
       }
-    });
+    );
+  }
+
+  private openSnackBar(message: string) {
+    this.snackBar.open(message, undefined, { duration: 3000 });
   }
 }

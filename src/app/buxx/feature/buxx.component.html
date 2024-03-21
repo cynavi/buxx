@@ -1,8 +1,11 @@
 <as-toolbar (newTransactionEmitter)="saveTransaction($event)"></as-toolbar>
 <div class="flex flex-col items-center justify-center">
-	<as-summary [loaded]="summaryStore.loaded()" [summary]="summaryStore.data()"></as-summary>
+  <as-summary [loaded]="summaryStore.loaded()" [summary]="summaryStore.data()"></as-summary>
+	<div class="items-center justify-center w-3/4">
+		<as-recent-activity [transactions]="recentActivityStore.data()"></as-recent-activity>
+	</div>
 	<mat-accordion class="flex flex-col w-3/4 sm:min-w-11/12 sm:mx-14">
-		<mat-expansion-panel class="w-full  sm:mx-14" [expanded]="false">
+		<mat-expansion-panel [expanded]="false" class="w-full sm:mx-14">
 			<mat-expansion-panel-header>
 				<mat-panel-title class="text-lg">
 					<mat-icon class="mr-2">tune</mat-icon>

@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { supabase } from '../../../supabase/supabase';
 
 export const buildFilter = (query: Query, userId: string): BuxxFilterBuilder => {
-  const {criteria, paginate} = query;
+  const { criteria, paginate } = query;
   let filter: BuxxFilterBuilder = supabase
     .from(TRANSACTIONS)
     .select('id, name, details, date, isExpense, userId, amount', { count: 'exact' });
@@ -16,8 +16,9 @@ export const buildFilter = (query: Query, userId: string): BuxxFilterBuilder => 
   if (criteria?.date) {
     buildDateRangeFilter(filter, criteria.date.start, criteria.date.end);
   }
-  filter = filter.eq('userId', userId);
-  filter = filter.range(paginate?.range.start!, paginate?.range.end!);
+  filter = filter.eq('userId', userId)
+    .range(paginate?.range.start!, paginate?.range.end!)
+    .order('amount', { ascending: false });
   return filter;
 };
 

@@ -50,6 +50,8 @@ import { PositiveNumberOnlyDirective } from '../../shared/util/positive-number.d
 import { MaskDateDirective } from '../../shared/util/date-mask.directive';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatProgressBar } from '@angular/material/progress-bar';
+import { RecentActivityComponent } from '../ui/recent-activity/recent-activity.component';
+import { RecentActivityStore } from '../data-access/recent-activity.store';
 
 export const filterValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const date = control.get('date');
@@ -83,17 +85,19 @@ export const filterValidator: ValidatorFn = (control: AbstractControl): Validati
     PositiveNumberOnlyDirective,
     MaskDateDirective,
     MatProgressSpinner,
-    MatProgressBar
+    MatProgressBar,
+    RecentActivityComponent
   ],
   templateUrl: './buxx.component.html',
   styleUrl: './buxx.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [TransactionStore, SummaryStore, SummaryService, QueryStore]
+  providers: [TransactionStore, SummaryStore, SummaryService, QueryStore, RecentActivityStore]
 })
 export class BuxxComponent implements OnInit, OnDestroy {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   readonly summaryStore = inject(SummaryStore);
+  readonly recentActivityStore = inject(RecentActivityStore);
   private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
   readonly transactionStore = inject(TransactionStore);
