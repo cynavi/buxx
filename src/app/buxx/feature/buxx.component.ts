@@ -48,6 +48,8 @@ import { queryInitialState, QueryStore } from '../data-access/query.store';
 import { environment } from '../../../environments/environment';
 import { PositiveNumberOnlyDirective } from '../../shared/util/positive-number.directive';
 import { MaskDateDirective } from '../../shared/util/date-mask.directive';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatProgressBar } from '@angular/material/progress-bar';
 import { RecentActivityComponent } from '../ui/recent-activity/recent-activity.component';
 import { RecentActivityStore } from '../data-access/recent-activity.store';
 
@@ -82,6 +84,8 @@ export const filterValidator: ValidatorFn = (control: AbstractControl): Validati
     SummaryComponent,
     PositiveNumberOnlyDirective,
     MaskDateDirective,
+    MatProgressSpinner,
+    MatProgressBar,
     RecentActivityComponent
   ],
   templateUrl: './buxx.component.html',
@@ -96,7 +100,7 @@ export class BuxxComponent implements OnInit, OnDestroy {
   readonly recentActivityStore = inject(RecentActivityStore);
   private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
-  private readonly transactionStore = inject(TransactionStore);
+  readonly transactionStore = inject(TransactionStore);
   private readonly queryStore = inject(QueryStore);
 
   private dataSource: MatTableDataSource<Transaction> = new MatTableDataSource<Transaction>([]);
@@ -192,6 +196,7 @@ export class BuxxComponent implements OnInit, OnDestroy {
       end = pointer - event.pageSize - 1;
     }
     this.queryStore.query$.next({
+      ...this.queryStore.query(),
       paginate: {
         pointer: event.previousPageIndex! < event.pageIndex
           ? pointer + environment.pageSize
