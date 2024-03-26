@@ -1,60 +1,21 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
-import { ToolbarComponent } from '../../shared/ui/toolbar/feature/toolbar.component';
-import {
-  Amount,
-  DeleteTransaction,
-  Operator,
-  Query,
-  SaveTransaction,
-  Transaction
-} from '../../shared/model/buxx.model';
+import { ChangeDetectionStrategy, Component, effect, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Criteria, DeleteTransaction, Query, SaveTransaction, Transaction } from '../../shared/model/buxx.model';
 import { TransactionStore } from '../data-access/transaction.store';
-import { AsyncPipe, DatePipe, NgClass } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
-import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { Observable } from 'rxjs';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn
-} from '@angular/forms';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { TransactionDialogComponent } from '../../shared/ui/add-new-dialog/feature/transaction-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
-import { SummaryComponent } from '../ui/summary/summary.component';
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { SummaryStore } from '../data-access/summary.store';
 import { SummaryService } from '../data-access/summary.service';
 import { queryInitialState, QueryStore } from '../data-access/query.store';
 import { environment } from '../../../environments/environment';
-import { PositiveNumberOnlyDirective } from '../../shared/util/positive-number.directive';
-import { MaskDateDirective } from '../../shared/util/date-mask.directive';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatProgressBar } from '@angular/material/progress-bar';
-import { RecentActivityComponent } from '../ui/recent-activity/recent-activity.component';
 import { RecentActivityStore } from '../data-access/recent-activity.store';
-import { NprCurrencyPipe } from '../../shared/util/npr-currency.pipe';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatCardModule } from '@angular/material/card';
+import { ToolbarComponent } from '../../shared/ui/toolbar/feature/toolbar.component';
+import { SummaryComponent } from '../ui/summary/summary.component';
+import { RecentActivityComponent } from '../ui/recent-activity/recent-activity.component';
+import { MatAccordion } from '@angular/material/expansion';
+import { TransactionFilterComponent } from '../ui/transaction-filter/transaction-filter.component';
+import { TransactionListComponent } from '../ui/transaction-list/transaction-list.component';
+import { FooterComponent } from '../../shared/ui/footer/footer.component';
 
 export const filterValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const date = control.get('date');
@@ -71,28 +32,13 @@ export const filterValidator: ValidatorFn = (control: AbstractControl): Validati
   standalone: true,
   imports: [
     ToolbarComponent,
-    NgClass,
-    MatButtonModule,
-    MatPaginatorModule,
-    MatExpansionModule,
-    AsyncPipe,
-    DatePipe,
-    MatIconModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatFormFieldModule,
-    ReactiveFormsModule,
-    MatSelectModule,
     SummaryComponent,
-    PositiveNumberOnlyDirective,
-    MaskDateDirective,
-    MatProgressSpinner,
-    MatProgressBar,
     RecentActivityComponent,
-    NprCurrencyPipe,
-    MatTooltipModule,
-    MatCardModule
+    MatAccordion,
+    TransactionFilterComponent,
+    TransactionListComponent,
+    MatPaginator,
+    FooterComponent
   ],
   templateUrl: './buxx.component.html',
   styleUrl: './buxx.component.scss',
@@ -104,14 +50,10 @@ export class BuxxComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   readonly summaryStore = inject(SummaryStore);
   readonly recentActivityStore = inject(RecentActivityStore);
-  private readonly fb = inject(FormBuilder);
-  private readonly dialog = inject(MatDialog);
   readonly transactionStore = inject(TransactionStore);
   private readonly queryStore = inject(QueryStore);
 
-  private dataSource: MatTableDataSource<Transaction> = new MatTableDataSource<Transaction>([]);
-  transactions$: Observable<Transaction[]> = toObservable(computed(() => this.transactionStore.data().transactions));
-  filterForm!: FormGroup;
+  readonly dataSource: MatTableDataSource<Transaction> = new MatTableDataSource<Transaction>([]);
   paginatorLength!: number;
 
   constructor() {
@@ -122,52 +64,15 @@ export class BuxxComponent implements OnInit, OnDestroy {
     });
   }
 
-  get startDate(): AbstractControl {
-    return this.filterForm.controls['date'].get('start')!;
-  }
-
-  get endDate(): AbstractControl {
-    return this.filterForm.controls['date'].get('end')!;
-  }
-
   ngOnInit(): void {
-    this.initQueryForm();
     this.dataSource.paginator = this.paginator;
     this.queryStore.query$.next(queryInitialState.query);
     this.summaryStore.fetch$.next(queryInitialState.query);
     this.transactionStore.fetch$.next(queryInitialState.query);
   }
 
-  initQueryForm(): void {
-    this.filterForm = this.fb.group({
-      date: this.fb.group({
-        start: this.fb.control<Date | null>(null),
-        end: this.fb.control<Date | null>(null)
-      }),
-      amount: this.fb.group({
-        operator: this.fb.control<Operator>('<'),
-        value: this.fb.control<number | null>(null)
-      }),
-      name: this.fb.control<string | null>(null)
-    }, { validators: filterValidator });
-  }
-
-  applyFilter(): void {
-    let amount: Amount | undefined;
-    if (this.filterForm.value.amount.value) {
-      amount = {
-        value: this.filterForm.value.amount.value,
-        op: this.filterForm.value.amount.operator
-      };
-    }
-    this.queryStore.query$.next({
-      criteria: {
-        amount,
-        date: this.filterForm.value.date,
-        name: this.filterForm.value.name
-      },
-      paginate: queryInitialState.query.paginate
-    });
+  applyFilter(criteria: Criteria): void {
+    this.queryStore.query$.next({ criteria, paginate: queryInitialState.query.paginate });
   }
 
   saveTransaction(transaction: SaveTransaction): void {
@@ -175,15 +80,7 @@ export class BuxxComponent implements OnInit, OnDestroy {
   }
 
   updateTransaction(transaction: Transaction): void {
-    const dialogRef = this.dialog.open(TransactionDialogComponent, {
-      data: transaction,
-      panelClass: ['flex', 'flex-col', 'items-center', 'justify-center', 'w-3/6', 'sm:min-w-11/12']
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.transactionStore.update$.next(result);
-      }
-    });
+    this.transactionStore.update$.next(transaction);
   }
 
   deleteTransaction(transactionId: DeleteTransaction): void {

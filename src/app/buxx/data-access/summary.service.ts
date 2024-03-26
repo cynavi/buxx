@@ -14,49 +14,50 @@ export class SummaryService {
   getSummary(query: Query): Observable<PostgrestSingleResponse<{ expense: number, income: number }[]>> {
     const { criteria, paginate } = query;
     if (criteria) {
-      if (criteria.date && criteria.amount && criteria.name) {
+      const dateValid = !!criteria.date && !!criteria.date.start && !!criteria.date.end;
+      if (dateValid && criteria.amount && criteria.name) {
         return from(supabase.rpc('getTotalIncomeAndExpense', {
           ownerId: this.authStore.session()?.user.id!,
-          fromDate: format(criteria.date.start, 'yyyy-MM-dd'),
-          toDate: format(criteria.date.end, 'yyyy-MM-dd'),
+          fromDate: format(criteria.date?.start!, 'yyyy-MM-dd'),
+          toDate: format(criteria.date?.end!, 'yyyy-MM-dd'),
           amountValue: criteria.amount.value,
           amountOperator: criteria.amount.op,
           transactionName: criteria.name
         }));
-      } else if (!criteria.date && criteria.amount && criteria.name) {
+      } else if (!dateValid && criteria.amount && criteria.name) {
         return from(supabase.rpc('getTotalIncomeAndExpense', {
           ownerId: this.authStore.session()?.user.id!,
           amountValue: criteria.amount.value,
           amountOperator: criteria.amount.op,
           transactionName: criteria.name
         }));
-      } else if (criteria.date && !criteria.amount && criteria.name) {
+      } else if (dateValid && !criteria.amount && criteria.name) {
         return from(supabase.rpc('getTotalIncomeAndExpense', {
           ownerId: this.authStore.session()?.user.id!,
-          fromDate: format(criteria.date.start, 'yyyy-MM-dd'),
-          toDate: format(criteria.date.end, 'yyyy-MM-dd'),
+          fromDate: format(criteria.date?.start!, 'yyyy-MM-dd'),
+          toDate: format(criteria.date?.end!, 'yyyy-MM-dd'),
           transactionName: criteria.name
         }));
-      } else if (criteria.date && criteria.amount && !criteria.name) {
+      } else if (dateValid && criteria.amount && !criteria.name) {
         return from(supabase.rpc('getTotalIncomeAndExpense', {
           ownerId: this.authStore.session()?.user.id!,
-          fromDate: format(criteria.date.start, 'yyyy-MM-dd'),
-          toDate: format(criteria.date.end, 'yyyy-MM-dd'),
+          fromDate: format(criteria.date?.start!, 'yyyy-MM-dd'),
+          toDate: format(criteria.date?.end!, 'yyyy-MM-dd'),
           amountValue: criteria.amount.value,
           amountOperator: criteria.amount.op
         }));
-      } else if (criteria.date && !criteria.amount && !criteria.name) {
+      } else if (dateValid && !criteria.amount && !criteria.name) {
         return from(supabase.rpc('getTotalIncomeAndExpense', {
           ownerId: this.authStore.session()?.user.id!,
-          fromDate: format(criteria.date.start, 'yyyy-MM-dd'),
-          toDate: format(criteria.date.end, 'yyyy-MM-dd')
+          fromDate: format(criteria.date?.start!, 'yyyy-MM-dd'),
+          toDate: format(criteria.date?.end!, 'yyyy-MM-dd')
         }));
-      } else if (!criteria.date && !criteria.amount && criteria.name) {
+      } else if (!dateValid && !criteria.amount && criteria.name) {
         return from(supabase.rpc('getTotalIncomeAndExpense', {
           ownerId: this.authStore.session()?.user.id!,
           transactionName: criteria.name
         }));
-      } else if (!criteria.date && criteria.amount && !criteria.name) {
+      } else if (!dateValid && criteria.amount && !criteria.name) {
         return from(supabase.rpc('getTotalIncomeAndExpense', {
           ownerId: this.authStore.session()?.user.id!,
           amountValue: criteria.amount.value,

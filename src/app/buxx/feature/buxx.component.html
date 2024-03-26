@@ -1,97 +1,27 @@
-<as-toolbar (newTransactionEmitter)="saveTransaction($event)"></as-toolbar>
-<div class="flex flex-col items-center justify-center">
-	<as-summary [loaded]="summaryStore.loaded()"
-	            [summary]="summaryStore.data()"
-	            class="flex w-3/4 items-center justify-center xl:w-11/12"></as-summary>
-	<as-recent-activity [transactions]="recentActivityStore.data()"
-	                    class="flex items-center w-3/4 justify-center xl:w-11/12 sm:min-w-11/12 sm:mx-14"></as-recent-activity>
-	<mat-accordion class="flex flex-col w-3/4 xl:w-11/12 sm:min-w-11/12 sm:mx-14">
-		<mat-expansion-panel [expanded]="false" class="w-full sm:mx-14">
-			<mat-expansion-panel-header>
-				<mat-panel-title class="text-lg">
-					<mat-icon class="mr-2">tune</mat-icon>
-					Filter
-				</mat-panel-title>
-			</mat-expansion-panel-header>
-			<div class="flex flex-col" [formGroup]="filterForm">
-				<div formGroupName="date">
-					<mat-form-field>
-						<mat-label>Date Between</mat-label>
-						<mat-date-range-input [disabled]="true" [rangePicker]="picker">
-							<input formControlName="start" matStartDate placeholder="Start date"/>
-							<input formControlName="end" matEndDate placeholder="End date"/>
-						</mat-date-range-input>
-						<mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-						<mat-date-range-picker #picker [disabled]="false"></mat-date-range-picker>
-
-						@if (startDate.hasError('matStartDateInvalid')) {
-							<mat-error>Invalid start date</mat-error>
-						}
-						@if (endDate.hasError('matEndDateInvalid')) {
-							<mat-error>Invalid end date</mat-error>
-						}
-					</mat-form-field>
-				</div>
-				<div formGroupName="amount">
-					<mat-form-field class="mr-2">
-						<mat-label>Amount</mat-label>
-						<mat-select formControlName="operator">
-							<mat-option value="<">less than</mat-option>
-							<mat-option value="<=">less than or equals</mat-option>
-							<mat-option value="==">equals</mat-option>
-							<mat-option value="!=">not equals</mat-option>
-							<mat-option value=">">greater than</mat-option>
-							<mat-option value=">=">greater than or equals</mat-option>
-						</mat-select>
-					</mat-form-field>
-					<mat-form-field>
-						<mat-label>Value</mat-label>
-						<input formControlName="value" matInput positiveNumberOnly>
-					</mat-form-field>
-				</div>
-				<div>
-					<mat-form-field>
-						<mat-label>Name Contains</mat-label>
-						<input matInput formControlName="name">
-					</mat-form-field>
-				</div>
-			</div>
-			<button (click)="applyFilter()" [disabled]="!filterForm.valid" color="accent" mat-button>Apply</button>
-		</mat-expansion-panel>
-
-		@if (transactionStore.loaded()) {
-			@for (transaction of transactions$ | async; track transaction.id) {
-				<mat-expansion-panel class="w-full">
-					<mat-expansion-panel-header>
-						<mat-panel-description class="w-full flex flex-row justify-between pr-2">
-							<div class="max-w-3/5 sm:max-w-2/5 flex items-center justify-start">
-								@if (transaction.isExpense) {
-									<mat-icon class="mr-4 negative">trending_down</mat-icon>
-								} @else {
-									<mat-icon class="mr-4 positive">trending_up</mat-icon>
-								}
-								<span class="truncate max-w-10/12 sm:max-w-8/12"
-								      [matTooltip]="transaction.name">{{ transaction.name }}</span>
-							</div>
-							<div>{{ transaction.amount | nprCurrency }}</div>
-							<div>{{ transaction.date | date: 'mediumDate' }}</div>
-						</mat-panel-description>
-					</mat-expansion-panel-header>
-					<p class="text-lg">{{ transaction.name }}</p>
-					<p>{{ transaction.details }}</p>
-					<button mat-button color="accent" (click)="updateTransaction(transaction)">Update</button>
-					<button mat-button color="warn" (click)="deleteTransaction(transaction.id)">Delete</button>
-				</mat-expansion-panel>
-			}
-		} @else {
-			<mat-progress-bar mode="indeterminate"></mat-progress-bar>
-		}
-
-		<mat-paginator aria-label="Select page"
-		               [hidePageSize]="true"
-		               [pageSize]="10"
-		               [length]="paginatorLength"
-		               (page)="paginate($event)"
-		></mat-paginator>
-	</mat-accordion>
+<div class="flex flex-col min-h-full">
+	<as-toolbar (newTransactionEmitter)="saveTransaction($event)"></as-toolbar>
+	<div class="flex flex-col items-center justify-center" style="flex: 1">
+		<as-summary [loaded]="summaryStore.loaded()"
+		            [summary]="summaryStore.data()"
+		            class="flex w-3/4 items-center justify-center xl:w-11/12">
+		</as-summary>
+		<as-recent-activity [transactions]="recentActivityStore.data()"
+		                    class="flex items-center w-3/4 justify-center xl:w-11/12 sm:min-w-11/12 sm:mx-14">
+		</as-recent-activity>
+		<mat-accordion class="flex flex-col w-3/4 xl:w-11/12 sm:min-w-11/12 sm:mx-14">
+			<as-transaction-filter (filterEmitter)="applyFilter($event)"></as-transaction-filter>
+			<as-transaction-list (deleteTransactionEmitter)="deleteTransaction($event)"
+			                     (updateTransactionEmitter)="updateTransaction($event)"
+			                     [loaded]="transactionStore.loaded()"
+			                     [transactions]="dataSource.data">
+			</as-transaction-list>
+			<mat-paginator (page)="paginate($event)"
+			               [hidePageSize]="true"
+			               [length]="paginatorLength"
+			               [pageSize]="10"
+			               aria-label="Select page"
+			></mat-paginator>
+		</mat-accordion>
+	</div>
+	<as-footer></as-footer>
 </div>

@@ -13,7 +13,7 @@ export const buildFilter = (query: Query, userId: string): BuxxFilterBuilder => 
   if (criteria?.amount?.value && criteria?.amount?.op) {
     buildAmountFilter(filter, criteria?.amount);
   }
-  if (criteria?.date) {
+  if (criteria?.date && criteria.date.start && criteria.date.end) {
     buildDateRangeFilter(filter, criteria.date.start, criteria.date.end);
   }
   filter = filter.eq('userId', userId)

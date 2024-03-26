@@ -1,0 +1,52 @@
+<mat-expansion-panel [expanded]="false" class="w-full sm:mx-14">
+	<mat-expansion-panel-header>
+		<mat-panel-title class="text-lg">
+			<mat-icon class="mr-2 text-primary-color">tune</mat-icon>
+			<span class="text-primary-color">Filter</span>
+		</mat-panel-title>
+	</mat-expansion-panel-header>
+	<div [formGroup]="filterForm" class="flex flex-col">
+		<div formGroupName="date">
+			<mat-form-field>
+				<mat-label>Date Between</mat-label>
+				<mat-date-range-input [disabled]="true" [rangePicker]="picker">
+					<input formControlName="start" matStartDate placeholder="Start date"/>
+					<input formControlName="end" matEndDate placeholder="End date"/>
+				</mat-date-range-input>
+				<mat-datepicker-toggle [for]="picker" matIconSuffix></mat-datepicker-toggle>
+				<mat-date-range-picker #picker [disabled]="false"></mat-date-range-picker>
+
+				@if (startDate.hasError('matStartDateInvalid')) {
+					<mat-error>Invalid start date</mat-error>
+				}
+				@if (endDate.hasError('matEndDateInvalid')) {
+					<mat-error>Invalid end date</mat-error>
+				}
+			</mat-form-field>
+		</div>
+		<div formGroupName="amount">
+			<mat-form-field class="mr-2">
+				<mat-label>Amount</mat-label>
+				<mat-select formControlName="operator">
+					<mat-option value="<">less than</mat-option>
+					<mat-option value="<=">less than or equals</mat-option>
+					<mat-option value="==">equals</mat-option>
+					<mat-option value="!=">not equals</mat-option>
+					<mat-option value=">">greater than</mat-option>
+					<mat-option value=">=">greater than or equals</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<mat-form-field>
+				<mat-label>Value</mat-label>
+				<input formControlName="value" matInput positiveNumberOnly>
+			</mat-form-field>
+		</div>
+		<div>
+			<mat-form-field>
+				<mat-label>Name Contains</mat-label>
+				<input formControlName="name" matInput>
+			</mat-form-field>
+		</div>
+	</div>
+	<button (click)="applyFilter()" [disabled]="!filterForm.valid" color="accent" mat-button>Apply</button>
+</mat-expansion-panel>

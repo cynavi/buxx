@@ -1,0 +1,28 @@
+@if (loaded()) {
+	@for (transaction of transactions(); track transaction.id) {
+		<mat-expansion-panel class="w-full">
+			<mat-expansion-panel-header>
+				<mat-panel-description class="w-full flex flex-row justify-between pr-2">
+					<div class="max-w-3/5 sm:max-w-2/5 flex items-center justify-start">
+						@if (transaction.isExpense) {
+							<mat-icon class="mr-4 negative">trending_down</mat-icon>
+						} @else {
+							<mat-icon class="mr-4 positive">trending_up</mat-icon>
+						}
+						<span class="truncate max-w-10/12 sm:max-w-8/12" [matTooltip]="transaction.name">
+							{{ transaction.name }}
+						</span>
+					</div>
+					<div>{{ transaction.amount | nprCurrency }}</div>
+					<div>{{ transaction.date | date: 'mediumDate' }}</div>
+				</mat-panel-description>
+			</mat-expansion-panel-header>
+			<p class="text-lg">{{ transaction.name }}</p>
+			<p>{{ transaction.details }}</p>
+			<button mat-button color="accent" (click)="updateTransaction(transaction)">Update</button>
+			<button mat-button color="warn" (click)="deleteTransaction(transaction.id)">Delete</button>
+		</mat-expansion-panel>
+	}
+} @else {
+	<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
