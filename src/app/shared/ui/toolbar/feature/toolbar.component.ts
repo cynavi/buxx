@@ -9,6 +9,9 @@ import { TransactionDialogComponent } from '../../add-new-dialog/feature/transac
 import { SaveTransaction } from '../../../model/buxx.model';
 import { AuthStore } from '../../../data-access/auth/auth.store';
 import { supabase } from '../../../../../supabase/supabase';
+import { queryInitialState, QueryStore } from '../../../../buxx/data-access/query.store';
+import { TransactionStore } from '../../../../buxx/data-access/transaction.store';
+import { SummaryStore } from '../../../../buxx/data-access/summary.store';
 
 @Component({
   selector: 'as-toolbar',
@@ -22,6 +25,10 @@ export class ToolbarComponent {
   private readonly dialog = inject(MatDialog);
   private readonly authStore = inject(AuthStore);
   private readonly router = inject(Router);
+  private readonly transactionStore = inject(TransactionStore);
+  private readonly queryStore = inject(QueryStore);
+  private readonly summaryStore = inject(SummaryStore);
+
   @Output() newTransactionEmitter = new EventEmitter<SaveTransaction>();
 
   openAddDialog(): void {
@@ -40,6 +47,12 @@ export class ToolbarComponent {
         });
       }
     });
+  }
+
+  refresh(): void {
+    this.queryStore.query$.next(queryInitialState.query);
+    this.summaryStore.fetch$.next(queryInitialState.query);
+    this.transactionStore.fetch$.next(queryInitialState.query);
   }
 
   signOut(): void {
