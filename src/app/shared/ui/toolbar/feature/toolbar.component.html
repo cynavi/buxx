@@ -2,13 +2,13 @@
 	<mat-toolbar-row>
 		<span class="text-xl cream">Buxx</span>
 		<span class="spacer"></span>
-		<button (click)="openAddDialog()" color="accent" mat-icon-button>
+		<button (click)="openAddDialog()" color="accent" mat-icon-button matTooltip="Add new transaction">
 			<mat-icon>add_circle</mat-icon>
 		</button>
-		<button (click)="refresh()" class="ml-2" color="accent" mat-icon-button>
+		<button (click)="refresh()" class="ml-2" color="accent" mat-icon-button matTooltip="Refresh transaction">
 			<mat-icon>refresh</mat-icon>
 		</button>
-		<button mat-icon-button [matMenuTriggerFor]="menu" >
+		<button [matMenuTriggerFor]="menu" mat-icon-button matTooltip="More">
 			<mat-icon>menu</mat-icon>
 		</button>
 	</mat-toolbar-row>

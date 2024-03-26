@@ -12,11 +12,12 @@ import { supabase } from '../../../../../supabase/supabase';
 import { queryInitialState, QueryStore } from '../../../../buxx/data-access/query.store';
 import { TransactionStore } from '../../../../buxx/data-access/transaction.store';
 import { SummaryStore } from '../../../../buxx/data-access/summary.store';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'as-toolbar',
   standalone: true,
-  imports: [MatToolbarModule, MatIconModule, MatButtonModule, RouterModule, MatMenuModule],
+  imports: [MatToolbarModule, MatIconModule, MatButtonModule, RouterModule, MatMenuModule, MatTooltipModule],
   templateUrl: './toolbar.component.html',
   styleUrl: './toolbar.component.scss'
 })
