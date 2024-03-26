@@ -24,7 +24,7 @@
 		<button mat-stroked-button
 		        color="primary"
 		        (click)="signIn()"
-		        [disabled]="!signInForm.valid">{{ signInStore.loaded() ? 'Sign In' : 'Signing In...' }}
+		        [disabled]="!signInForm.valid || !signInStore.loaded()">{{ signInStore.loaded() ? 'Sign In' : 'Signing In...' }}
 		</button>
 		<div class="cream text-lg mt-4 m-2 flex items-center justify-center">Not a user yet?</div>
 		<button (click)="signUp()" color="primary" mat-stroked-button>Sign Up</button>
