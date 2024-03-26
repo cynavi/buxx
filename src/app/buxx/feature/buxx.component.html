@@ -3,9 +3,8 @@
 	<as-summary [loaded]="summaryStore.loaded()"
 	            [summary]="summaryStore.data()"
 	            class="flex w-3/4 items-center justify-center xl:w-11/12"></as-summary>
-	<div class="items-center justify-center w-3/4 xl:w-11/12 sm:min-w-11/12 sm:mx-14">
-		<as-recent-activity [transactions]="recentActivityStore.data()"></as-recent-activity>
-	</div>
+	<as-recent-activity [transactions]="recentActivityStore.data()"
+	                    class="flex items-center w-3/4 justify-center xl:w-11/12 sm:min-w-11/12 sm:mx-14"></as-recent-activity>
 	<mat-accordion class="flex flex-col w-3/4 xl:w-11/12 sm:min-w-11/12 sm:mx-14">
 		<mat-expansion-panel [expanded]="false" class="w-full sm:mx-14">
 			<mat-expansion-panel-header>
@@ -65,13 +64,14 @@
 				<mat-expansion-panel class="w-full">
 					<mat-expansion-panel-header>
 						<mat-panel-description class="w-full flex flex-row justify-between pr-2">
-							<div class="truncate max-w-3/5 sm:max-w-2/5 flex items-center justify-center" >
+							<div class="max-w-3/5 sm:max-w-2/5 flex items-center justify-start">
 								@if (transaction.isExpense) {
 									<mat-icon class="mr-4 negative">trending_down</mat-icon>
 								} @else {
 									<mat-icon class="mr-4 positive">trending_up</mat-icon>
 								}
-								<span [matTooltip]="transaction.name">{{transaction.name}}</span>
+								<span class="truncate max-w-10/12 sm:max-w-8/12"
+								      [matTooltip]="transaction.name">{{ transaction.name }}</span>
 							</div>
 							<div>{{ transaction.amount | nprCurrency }}</div>
 							<div>{{ transaction.date | date: 'mediumDate' }}</div>

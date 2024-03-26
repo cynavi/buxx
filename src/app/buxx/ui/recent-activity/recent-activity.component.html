@@ -1,5 +1,5 @@
 @if (transactions().length) {
-	<mat-accordion class="flex flex-col w-full mb-4 sm:min-w-11/12 sm:mx-14">
+	<mat-accordion class="flex flex-col min-w-full mb-4 sm:mx-14">
 		<mat-expansion-panel [hideToggle]="true">
 			<mat-expansion-panel-header>
 				<mat-panel-title class="text-lg">
@@ -12,25 +12,25 @@
 		@for (transaction of transactions(); track transaction.id) {
 			<mat-expansion-panel class="w-full">
 				<mat-expansion-panel-header>
-					<mat-panel-title>
-						<span class="mr-4 font-bold">
+					<mat-panel-description class="w-full flex flex-row justify-between pr-2">
+						<div class="max-w-3/5 sm:max-w-2/5 flex items-center justify-start">
 							@if (transaction.isExpense) {
-								<mat-icon class="negative">trending_down</mat-icon>
+								<mat-icon class="mr-4 negative">trending_down</mat-icon>
 							} @else {
-								<mat-icon class="positive">trending_up</mat-icon>
+								<mat-icon class="mr-4 positive">trending_up</mat-icon>
 							}
-						</span>
-						{{ transaction.name }}
-						<span class="ml-2">
-						@if (transaction.action === 'DELETED') {
-							<mat-chip style="background: #6f1a07">deleted</mat-chip>
-						} @else if (transaction.action === 'SAVED') {
-							<mat-chip style="background: #607d8b">saved</mat-chip>
-						}
-					</span>
-					</mat-panel-title>
-					<mat-panel-description>Rs. {{ transaction.amount }}</mat-panel-description>
-					<mat-panel-description>{{ transaction.date | date: 'mediumDate' }}</mat-panel-description>
+							<span class="truncate max-w-10/12 sm:max-w-8/12"
+							      [matTooltip]="transaction.name">{{ transaction.name }}</span>
+						</div>
+						<div>{{ transaction.amount | nprCurrency }}</div>
+						<div class="ml-2">
+							@if (transaction.action === 'DELETED') {
+								<mat-chip style="background: #6f1a07">deleted</mat-chip>
+							} @else if (transaction.action === 'SAVED') {
+								<mat-chip style="background: #607d8b">saved</mat-chip>
+							}
+						</div>
+					</mat-panel-description>
 				</mat-expansion-panel-header>
 				<p>{{ transaction.details }}</p>
 			</mat-expansion-panel>

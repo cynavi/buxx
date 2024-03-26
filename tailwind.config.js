@@ -19,7 +19,11 @@ module.exports = {
         '11/12': '91.666667% !important'
       },
       maxWidth: {
-        '2/5': '40%'
+        '2/5': '40% !important',
+        '3/5': '60% !important',
+        '10/12': '83.333333% !important',
+        '9/12': '75% !important',
+        '8/12': '66.666667% !important',
       }
     },
   },

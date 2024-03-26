@@ -6,6 +6,8 @@ import { RecentTransaction } from '../../../shared/model/buxx.model';
 import { MatChipsModule } from '@angular/material/chips';
 import { DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
+import { NprCurrencyPipe } from '../../../shared/util/npr-currency.pipe';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'as-recent-activity',
@@ -16,7 +18,9 @@ import { MatCardModule } from '@angular/material/card';
     MatIconModule,
     MatChipsModule,
     DatePipe,
-    MatCardModule
+    MatCardModule,
+    NprCurrencyPipe,
+    MatTooltipModule
   ],
   templateUrl: './recent-activity.component.html',
   styleUrl: './recent-activity.component.scss',
@@ -24,26 +28,4 @@ import { MatCardModule } from '@angular/material/card';
 export class RecentActivityComponent {
 
   transactions = input.required<RecentTransaction[]>();
-  // transactions: RecentTransaction[] = [
-  //   {
-  //     action: 'DELETED',
-  //     date: (new Date()).toString(),
-  //     id: 'sds',
-  //     name: 'Test Name',
-  //     isExpense: true,
-  //     details: 'sdfd',
-  //     amount: 222,
-  //     userId: 'sdfsdf'
-  //   },
-  //   {
-  //     action: 'SAVED',
-  //     date: (new Date()).toString(),
-  //     id: 'sds',
-  //     name: 'Test Name Again',
-  //     isExpense: true,
-  //     details: 'sdfd',
-  //     amount: 222,
-  //     userId: 'sdfsdf'
-  //   }
-  // ];
 }
