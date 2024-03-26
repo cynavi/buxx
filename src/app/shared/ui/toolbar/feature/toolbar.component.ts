@@ -26,7 +26,7 @@ export class ToolbarComponent {
 
   openAddDialog(): void {
     const dialogRef = this.dialog.open(TransactionDialogComponent, {
-      panelClass: ['w-3/6']
+      panelClass: ['flex', 'flex-col', 'items-center', 'justify-center', 'w-3/6', 'sm:min-w-11/12']
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {

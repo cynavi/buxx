@@ -16,7 +16,10 @@ module.exports = {
         'sm': {'max': '639px'}, // => @media (max-width: 639px) { ... }
       },
       minWidth: {
-        '11/12': '91.666667%'
+        '11/12': '91.666667% !important'
+      },
+      maxWidth: {
+        '2/5': '40%'
       }
     },
   },

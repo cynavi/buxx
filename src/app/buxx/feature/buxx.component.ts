@@ -53,6 +53,8 @@ import { MatProgressBar } from '@angular/material/progress-bar';
 import { RecentActivityComponent } from '../ui/recent-activity/recent-activity.component';
 import { RecentActivityStore } from '../data-access/recent-activity.store';
 import { NprCurrencyPipe } from '../../shared/util/npr-currency.pipe';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardModule } from '@angular/material/card';
 
 export const filterValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const date = control.get('date');
@@ -88,7 +90,9 @@ export const filterValidator: ValidatorFn = (control: AbstractControl): Validati
     MatProgressSpinner,
     MatProgressBar,
     RecentActivityComponent,
-    NprCurrencyPipe
+    NprCurrencyPipe,
+    MatTooltipModule,
+    MatCardModule
   ],
   templateUrl: './buxx.component.html',
   styleUrl: './buxx.component.scss',
@@ -173,7 +177,7 @@ export class BuxxComponent implements OnInit, OnDestroy {
   updateTransaction(transaction: Transaction): void {
     const dialogRef = this.dialog.open(TransactionDialogComponent, {
       data: transaction,
-      panelClass: ['w-3/6']
+      panelClass: ['flex', 'flex-col', 'items-center', 'justify-center', 'w-3/6', 'sm:min-w-11/12']
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {

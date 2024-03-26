@@ -36,6 +36,14 @@ mat-card {
   color: #CED4DA;
 }
 
+p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+mat-dialog-container {
+  display: flex !important;
+}
+
 /* custom scrollbar */
 ::-webkit-scrollbar {
   width: 15px;

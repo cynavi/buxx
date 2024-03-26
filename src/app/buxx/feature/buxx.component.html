@@ -1,10 +1,12 @@
 <as-toolbar (newTransactionEmitter)="saveTransaction($event)"></as-toolbar>
 <div class="flex flex-col items-center justify-center">
-  <as-summary [loaded]="summaryStore.loaded()" [summary]="summaryStore.data()"></as-summary>
-	<div class="items-center justify-center w-3/4">
+	<as-summary [loaded]="summaryStore.loaded()"
+	            [summary]="summaryStore.data()"
+	            class="flex w-3/4 items-center justify-center xl:w-11/12"></as-summary>
+	<div class="items-center justify-center w-3/4 xl:w-11/12 sm:min-w-11/12 sm:mx-14">
 		<as-recent-activity [transactions]="recentActivityStore.data()"></as-recent-activity>
 	</div>
-	<mat-accordion class="flex flex-col w-3/4 sm:min-w-11/12 sm:mx-14">
+	<mat-accordion class="flex flex-col w-3/4 xl:w-11/12 sm:min-w-11/12 sm:mx-14">
 		<mat-expansion-panel [expanded]="false" class="w-full sm:mx-14">
 			<mat-expansion-panel-header>
 				<mat-panel-title class="text-lg">
@@ -17,8 +19,8 @@
 					<mat-form-field>
 						<mat-label>Date Between</mat-label>
 						<mat-date-range-input [disabled]="true" [rangePicker]="picker">
-							<input formControlName="start" matStartDate placeholder="Start date" />
-							<input formControlName="end" matEndDate placeholder="End date" />
+							<input formControlName="start" matStartDate placeholder="Start date"/>
+							<input formControlName="end" matEndDate placeholder="End date"/>
 						</mat-date-range-input>
 						<mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
 						<mat-date-range-picker #picker [disabled]="false"></mat-date-range-picker>
@@ -62,26 +64,23 @@
 			@for (transaction of transactions$ | async; track transaction.id) {
 				<mat-expansion-panel class="w-full">
 					<mat-expansion-panel-header>
-						<mat-panel-title>
-						<span class="mr-4 font-bold">
-							@if (transaction.isExpense) {
-								<mat-icon class="negative">trending_down</mat-icon>
-							} @else {
-								<mat-icon class="positive">trending_up</mat-icon>
-							}
-						</span>
-							{{ transaction.name }}
-						</mat-panel-title>
-						<mat-panel-description>{{ transaction.amount | nprCurrency }}</mat-panel-description>
-						<mat-panel-description>
-							{{ transaction.date | date: 'mediumDate' }}
+						<mat-panel-description class="w-full flex flex-row justify-between pr-2">
+							<div class="truncate max-w-3/5 sm:max-w-2/5 flex items-center justify-center" >
+								@if (transaction.isExpense) {
+									<mat-icon class="mr-4 negative">trending_down</mat-icon>
+								} @else {
+									<mat-icon class="mr-4 positive">trending_up</mat-icon>
+								}
+								<span [matTooltip]="transaction.name">{{transaction.name}}</span>
+							</div>
+							<div>{{ transaction.amount | nprCurrency }}</div>
+							<div>{{ transaction.date | date: 'mediumDate' }}</div>
 						</mat-panel-description>
 					</mat-expansion-panel-header>
-					<div class="flex flex-row float-right sm:flex-col sm:float-none">
-						<button mat-button color="accent" class="sm:mb-2" (click)="updateTransaction(transaction)">Update</button>
-						<button mat-button color="warn" (click)="deleteTransaction(transaction.id)">Delete</button>
-					</div>
+					<p class="text-lg">{{ transaction.name }}</p>
 					<p>{{ transaction.details }}</p>
+					<button mat-button color="accent" (click)="updateTransaction(transaction)">Update</button>
+					<button mat-button color="warn" (click)="deleteTransaction(transaction.id)">Delete</button>
 				</mat-expansion-panel>
 			}
 		} @else {
