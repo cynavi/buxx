@@ -20,7 +20,7 @@ Before you fire up dev server, you need to setup supabase configuration:
 ### 1. Create Supabase project
 Headover to [supabase](https://supabase.com/) and start (create) your project.
 
-### Creating table
+### 2. Creating table
 On your project dashboard go to sql editor and run the following query:
 <details>
 <summary>SQL</summary>
@@ -40,7 +40,7 @@ create table transactions (
 </details>
 
 
-### Configuring row level security
+### 3. Configuring row level security
 Row level security allows to you to control which users are permitted to perform select/insert/update/delete
 statements on specific rows within tables and views.
 
@@ -64,7 +64,7 @@ create policy "Users can update their own transaction" on transactions
 </details>
 
 
-### Configuring rpc functions
+### 4. Configuring rpc functions
 Likewise, you also need to create rpc function which basically calculates income and expense with provided filters.
 <details>
 <summary>SQL</summary>
@@ -322,6 +322,8 @@ $$;
 ```
 </details>
 
+### Running application locally
+
 ### 1. Clone the repository
 ```shell
 git clone https://github.com/cynavi/buxx.git
@@ -346,13 +348,13 @@ export const environment = {
 };
 ```
 
-### 3. Run the dev server
+### 4. Run the dev server
 ```shell
 npx nx serve
 ```
 
-### 6. Open the app in your browser
+### 5. Open the app in your browser
 
 Visit [http://localhost:4200](http://localhost:4200) in your browser. 
 
-Happy coding! :)
+Happy coding :)
