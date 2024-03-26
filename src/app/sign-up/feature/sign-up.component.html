@@ -1,46 +1,52 @@
-<div class="h-screen flex items-center justify-center">
-	<div [formGroup]="signUpForm" class="flex flex-col w-3/12 md:w-5/12 sm:w-11/12">
-		<mat-form-field>
-			<mat-label>Email</mat-label>
-			<input [errorStateMatcher]="matcher" formControlName="email" matInput type="email">
-			@if (email.hasError('email') && !email.hasError('required')) {
-				<mat-error>Enter a valid email address</mat-error>
-			}
-			@if (email.hasError('required')) {
-				<mat-error>Email is required</mat-error>
-			}
-		</mat-form-field>
+<div [formGroup]="signUpForm" class="flex flex-col h-screen items-center justify-center">
+	<mat-form-field class="w-3/12 md:w-5/12 sm:min-w-11/12">
+		<mat-label>Email</mat-label>
+		<input [errorStateMatcher]="matcher" formControlName="email" matInput type="email">
+		@if (email.hasError('email') && !email.hasError('required')) {
+			<mat-error>Enter a valid email address</mat-error>
+		}
+		@if (email.hasError('required')) {
+			<mat-error>Email is required</mat-error>
+		}
+	</mat-form-field>
 
-		<mat-form-field [ngClass]="password.hasError('pattern') ? '' : 'mb-5'" subscriptSizing="dynamic">
-			<mat-label>Password</mat-label>
-			<input [errorStateMatcher]="matcher" [type]="hide ? 'password' : 'text'" formControlName="password" matInput>
-			<button (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide" mat-icon-button
-			        matSuffix>
-				<mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
-			</button>
-			@if (password.hasError('pattern') && !password.hasError('required')) {
-				<mat-error class="text-wrap">Password must be at least 8 length with one uppercase letter, one lowercase letter,
-					one digit and one special character
-				</mat-error>
-			}
-			@if (password.hasError('required')) {
-				<mat-error>Password is required</mat-error>
-			}
-		</mat-form-field>
-		<mat-form-field>
-			<mat-label>Name</mat-label>
-			<input [errorStateMatcher]="matcher" formControlName="name" matInput type="text">
-			@if (signUpForm.get('name')?.hasError('required')) {
-				<mat-error>Name is required</mat-error>
-			}
-		</mat-form-field>
-
-		<button (click)="signUp()"
-		        [disabled]="!signUpForm.valid || !signUpStore.loaded()"
-		        color="primary"
-		        mat-stroked-button>{{ signUpStore.loaded() ? 'Sign Up' : 'Signing Up...' }}
+	<mat-form-field [ngClass]="password.hasError('pattern') ? '' : 'mb-5'"
+	                class="w-3/12 md:w-5/12 sm:min-w-11/12"
+	                subscriptSizing="dynamic">
+		<mat-label>Password</mat-label>
+		<input [errorStateMatcher]="matcher" [type]="hide ? 'password' : 'text'" formControlName="password" matInput>
+		<button (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide" mat-icon-button
+		        matSuffix>
+			<mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
 		</button>
-		<div class="cream text-lg mt-4 m-2 flex items-center justify-center">Already a user?</div>
-		<button (click)="signIn()" color="primary" mat-stroked-button>Sign In</button>
-	</div>
+		@if (password.hasError('pattern') && !password.hasError('required')) {
+			<mat-error class="text-wrap">Password must be at least 8 length with one uppercase letter, one lowercase letter,
+				one digit and one special character
+			</mat-error>
+		}
+		@if (password.hasError('required')) {
+			<mat-error>Password is required</mat-error>
+		}
+	</mat-form-field>
+	<mat-form-field class="w-3/12 md:w-5/12 sm:min-w-11/12">
+		<mat-label>Name</mat-label>
+		<input [errorStateMatcher]="matcher" formControlName="name" matInput type="text">
+		@if (signUpForm.get('name')?.hasError('required')) {
+			<mat-error>Name is required</mat-error>
+		}
+	</mat-form-field>
+
+	<button (click)="signUp()"
+	        [disabled]="!signUpForm.valid || !signUpStore.loaded()"
+	        class="w-3/12 md:w-5/12 sm:min-w-11/12"
+	        color="primary"
+	        mat-stroked-button>{{ signUpStore.loaded() ? 'Sign Up' : 'Signing Up...' }}
+	</button>
+	<div class="cream text-lg mt-4 m-2 flex items-center justify-center">Already a user?</div>
+	<button (click)="signIn()"
+	        class="w-3/12 md:w-5/12 sm:min-w-11/12"
+	        color="primary"
+	        mat-stroked-button>
+		Sign In
+	</button>
 </div>

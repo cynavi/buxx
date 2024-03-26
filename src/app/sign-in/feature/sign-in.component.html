@@ -1,32 +1,31 @@
-<div class="h-screen flex items-center justify-center">
-	<div class="flex flex-col w-3/12 md:w-5/12 sm:w-11/12" [formGroup]="signInForm">
-		<mat-form-field class="">
-			<mat-label>Email</mat-label>
-			<input type="email" matInput formControlName="email" [errorStateMatcher]="matcher"
-			       placeholder="Ex. pat@example.com">
-			@if (email.hasError('email') && !email.hasError('required')) {
-				<mat-error>Please enter a valid email address</mat-error>
-			}
-			@if (email.hasError('required')) {
-				<mat-error>Email is required</mat-error>
-			}
-		</mat-form-field>
+<div [formGroup]="signInForm" class="flex flex-col h-screen w-full items-center justify-center">
+	<mat-form-field class="w-3/12 md:w-5/12 sm:min-w-11/12">
+		<mat-label>Email</mat-label>
+		<input [errorStateMatcher]="matcher" formControlName="email" matInput placeholder="Ex. pat@example.com"
+		       type="email">
+		@if (email.hasError('email') && !email.hasError('required')) {
+			<mat-error>Please enter a valid email address</mat-error>
+		}
+		@if (email.hasError('required')) {
+			<mat-error>Email is required</mat-error>
+		}
+	</mat-form-field>
 
-		<mat-form-field>
-			<mat-label>Password</mat-label>
-			<input matInput [type]="hide ? 'password' : 'text'" formControlName="password">
-			<button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
-			        [attr.aria-pressed]="hide">
-				<mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
-			</button>
-		</mat-form-field>
-
-		<button mat-stroked-button
-		        color="primary"
-		        (click)="signIn()"
-		        [disabled]="!signInForm.valid || !signInStore.loaded()">{{ signInStore.loaded() ? 'Sign In' : 'Signing In...' }}
+	<mat-form-field class="w-3/12 md:w-5/12 sm:min-w-11/12">
+		<mat-label>Password</mat-label>
+		<input [type]="hide ? 'password' : 'text'" formControlName="password" matInput>
+		<button (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide" mat-icon-button
+		        matSuffix>
+			<mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
 		</button>
-		<div class="cream text-lg mt-4 m-2 flex items-center justify-center">Not a user yet?</div>
-		<button (click)="signUp()" color="primary" mat-stroked-button>Sign Up</button>
-	</div>
+	</mat-form-field>
+
+	<button (click)="signIn()"
+	        [disabled]="!signInForm.valid || !signInStore.loaded()"
+	        class="w-3/12 md:w-5/12 sm:min-w-11/12"
+	        color="primary"
+	        mat-stroked-button>{{ signInStore.loaded() ? 'Sign In' : 'Signing In...' }}
+	</button>
+	<div class="cream text-lg mt-4 m-2 flex items-center justify-center">Not a user yet?</div>
+	<button (click)="signUp()" class="w-3/12 md:w-5/12 sm:min-w-11/12" color="primary" mat-stroked-button>Sign Up</button>
 </div>
