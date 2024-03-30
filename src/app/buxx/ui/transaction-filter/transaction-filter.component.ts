@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -27,7 +27,8 @@ import { PositiveNumberOnlyDirective } from '../../../shared/util/positive-numbe
     MatInputModule,
     PositiveNumberOnlyDirective
   ],
-  templateUrl: './transaction-filter.component.html'
+  templateUrl: './transaction-filter.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionFilterComponent implements OnInit {
 

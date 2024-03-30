@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,6 +24,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   ],
   templateUrl: './recent-activity.component.html',
   styleUrl: './recent-activity.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RecentActivityComponent {
 

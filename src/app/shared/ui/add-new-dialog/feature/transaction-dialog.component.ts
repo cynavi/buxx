@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -28,6 +28,7 @@ import { MaskDateDirective } from '../../../util/date-mask.directive';
     PositiveNumberOnlyDirective,
     MaskDateDirective
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideNativeDateAdapter()]
 })
 export class TransactionDialogComponent implements OnInit {
@@ -50,7 +51,7 @@ export class TransactionDialogComponent implements OnInit {
       amount: this.fb.control('', [Validators.required]),
       date: this.fb.control('', [Validators.required]),
       isExpense: this.fb.control('', [Validators.required]),
-      details: this.fb.control('', [Validators.required])
+      details: this.fb.control('')
     });
   }
 

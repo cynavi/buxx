@@ -2,8 +2,8 @@
 	@for (transaction of transactions(); track transaction.id) {
 		<mat-expansion-panel class="w-full">
 			<mat-expansion-panel-header>
-				<mat-panel-description class="w-full flex flex-row justify-between pr-2">
-					<div class="max-w-3/5 sm:max-w-2/5 flex items-center justify-start">
+				<mat-panel-description class="flex flex-row justify-between w-full pr-2 sm:flex-col">
+					<div class="min-w-3/5 flex items-center justify-start mr-2 sm:min-w-full sm:mr-0 sm:items-start">
 						@if (transaction.isExpense) {
 							<mat-icon class="mr-4 negative">trending_down</mat-icon>
 						} @else {
@@ -13,11 +13,13 @@
 							{{ transaction.name }}
 						</span>
 					</div>
-					<div>{{ transaction.amount | nprCurrency }}</div>
-					<div>{{ transaction.date | date: 'mediumDate' }}</div>
+					<div class="min-w-1/5 sm:min-w-full sm:ml-20">{{ transaction.amount | nprCurrency }}</div>
+					<div class="min-w-1/5 sm:hidden">{{ transaction.date | date: 'mediumDate' }}</div>
 				</mat-panel-description>
 			</mat-expansion-panel-header>
 			<p class="text-lg">{{ transaction.name }}</p>
+			<p> {{transaction.amount | nprCurrency}}</p>
+			<p>{{transaction.date | date: 'mediumDate'}}</p>
 			<p>{{ transaction.details }}</p>
 			<button mat-button color="accent" (click)="updateTransaction(transaction)">Update</button>
 			<button mat-button color="warn" (click)="deleteTransaction(transaction.id)">Delete</button>

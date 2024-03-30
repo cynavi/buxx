@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, input, Output } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIcon } from '@angular/material/icon';
@@ -22,7 +22,8 @@ import { DatePipe } from '@angular/common';
     MatTooltipModule,
     DatePipe
   ],
-  templateUrl: './transaction-list.component.html'
+  templateUrl: './transaction-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionListComponent {
 

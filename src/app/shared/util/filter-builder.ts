@@ -18,7 +18,7 @@ export const buildFilter = (query: Query, userId: string): BuxxFilterBuilder => 
   }
   filter = filter.eq('userId', userId)
     .range(paginate?.range.start!, paginate?.range.end!)
-    .order('amount', { ascending: false });
+    .order('date', { ascending: false });
   return filter;
 };
 

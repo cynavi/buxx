@@ -6,7 +6,7 @@ import { sub } from 'date-fns';
 import { environment } from '../../../environments/environment';
 import { TransactionStore } from './transaction.store';
 import { SummaryStore } from './summary.store';
-import * as _ from 'lodash';
+import { isEqual } from 'lodash';
 
 export interface QueryState {
   query: Query;
@@ -15,12 +15,8 @@ export interface QueryState {
 export const queryInitialState: QueryState = {
   query: {
     criteria: {
-      amount: {
-        op: '<=',
-        value: 500
-      },
       date: {
-        start: sub(new Date(), { years: 1 }),
+        start: sub(new Date(), { years: 6 }),
         end: new Date()
       }
     },
@@ -46,8 +42,8 @@ export class QueryStore {
   constructor() {
     this.query$.pipe(takeUntilDestroyed())
       .subscribe(query => {
-        const isCriteriaChange = !_.isEqual(query.criteria, this.query()?.criteria);
-        const isPagination = !_.isEqual(query.paginate, this.query()?.paginate);
+        const isCriteriaChange = !isEqual(query.criteria, this.query()?.criteria);
+        const isPagination = !isEqual(query.paginate, this.query()?.paginate);
         if (isCriteriaChange || isPagination) {
           this.transactionStore.fetch$.next(query);
           if (isCriteriaChange) this.summaryStore.fetch$.next(query);
